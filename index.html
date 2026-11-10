@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL GLOBAL THREAT MONITOR | v4.0.2</title>
+    <title>SYSTEMA GLOBAL THREAT MONITOR // ENTERPRISE EDITION</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Dependencies: Fixed versions for stability -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            --color-white: #FFFFFF;
-            --color-black: #000000;
-            --color-gray-dark: #171717;
-            --color-gray-mid: #777777;
-            --color-gray-light: #EAEAEA;
-            --border-ui: 1px solid #222222;
+            --bg-deep: #000000;
+            --bg-panel: rgba(10, 10, 10, 0.85);
+            --accent-green: #00FF78;
+            --accent-green-dim: #00B85A;
+            --border-color: #222222;
+            --text-primary: #FFFFFF;
+            --text-secondary: #777777;
+            --text-dim: #444444;
             --font-main: 'Inter', sans-serif;
-            --font-tech: 'IBM Plex Sans', sans-serif;
             --font-mono: 'IBM Plex Mono', monospace;
         }
 
@@ -35,25 +38,25 @@
         }
 
         body {
-            background-color: var(--color-black);
-            color: var(--color-white);
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
             font-family: var(--font-main);
             overflow: hidden;
             height: 100vh;
             width: 100vw;
         }
 
-        /* --- UI LAYOUT --- */
-        #app {
+        /* --- UI STRUCTURE --- */
+        #app-interface {
             position: relative;
             width: 100%;
             height: 100%;
             display: grid;
-            grid-template-columns: 300px 1fr 320px;
-            grid-template-rows: 40px 1fr 35px;
+            grid-template-columns: 320px 1fr 350px;
+            grid-template-rows: 50px 1fr 40px;
             grid-template-areas: 
                 "header header header"
-                "left main right"
+                "nav-left viewport nav-right"
                 "footer footer footer";
             z-index: 10;
             pointer-events: none;
@@ -61,509 +64,570 @@
 
         header, aside, footer {
             pointer-events: auto;
-            backdrop-filter: blur(10px);
-            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
         }
 
         header {
             grid-area: header;
-            border-bottom: var(--border-ui);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            padding: 0 25px;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: none;
+            border-left: none;
+            border-right: none;
         }
 
-        .header-brand {
-            font-weight: 700;
+        .header-title {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
         }
 
-        .status-dot {
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 9px;
+            color: var(--accent-green);
+        }
+
+        .pulse-dot {
             width: 6px;
             height: 6px;
-            background: var(--color-white);
+            background-color: var(--accent-green);
             border-radius: 50%;
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse-green 2s infinite;
         }
 
-        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+        @keyframes pulse-green {
+            0% { opacity: 0.3; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.3; transform: scale(0.9); }
+        }
 
+        /* --- PANELS --- */
         aside {
-            padding: 20px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 30px;
+            background: var(--bg-panel);
             overflow-y: auto;
             scrollbar-width: none;
         }
+        aside::-webkit-scrollbar { display: none; }
 
-        .left-panel { grid-area: left; border-right: var(--border-ui); }
-        .right-panel { grid-area: right; border-left: var(--border-ui); }
+        .nav-left { grid-area: nav-left; border-top: none; border-bottom: none; border-left: none; }
+        .nav-right { grid-area: nav-right; border-top: none; border-bottom: none; border-right: none; }
 
         footer {
             grid-area: footer;
-            border-top: var(--border-ui);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 25px;
             font-family: var(--font-mono);
             font-size: 10px;
-            color: var(--color-gray-mid);
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
         }
 
-        /* --- COMPONENTS --- */
-        .module-header {
+        /* --- MODULES --- */
+        .module {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .module-label {
             font-family: var(--font-mono);
-            font-size: 9px;
-            color: var(--color-gray-mid);
+            font-size: 10px;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid #1a1a1a;
-            padding-bottom: 6px;
-            margin-bottom: 12px;
+            letter-spacing: 2px;
             display: flex;
             justify-content: space-between;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 8px;
         }
 
-        .stat-value { font-family: var(--font-mono); font-size: 22px; }
-        .stat-label { font-size: 9px; color: var(--color-gray-mid); text-transform: uppercase; }
+        .metric-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
 
-        .incident-item {
+        .metric-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-value {
             font-family: var(--font-mono);
-            padding: 8px 0;
-            border-bottom: 1px solid #111;
+            font-size: 24px;
+            color: var(--text-primary);
         }
 
-        .incident-info { font-size: 10px; color: var(--color-gray-light); display: block; margin: 4px 0; }
-        .incident-meta { display: flex; gap: 8px; font-size: 8px; color: #444; }
+        .metric-sub {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
 
-        /* --- GLOBE & 2D VIEW --- */
-        #viewport-container {
+        /* --- INCIDENT FEED --- */
+        .incident-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #111;
+            font-family: var(--font-mono);
+            transition: all 0.2s;
+        }
+
+        .incident-item:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            margin-bottom: 6px;
+        }
+
+        .incident-type { color: var(--accent-green); font-weight: 600; }
+        .incident-target { font-size: 11px; color: var(--text-primary); display: block; margin-bottom: 4px; }
+        .incident-meta { display: flex; gap: 12px; font-size: 9px; color: var(--text-dim); }
+
+        /* --- GLOBE VIEWPORT --- */
+        #globe-viz {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: 1;
-            background: #000;
         }
 
-        #view-toggle {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            pointer-events: auto;
-            display: flex;
-            gap: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 5px;
-            border: var(--border-ui);
-        }
-
-        .toggle-btn {
-            background: transparent;
-            border: none;
-            color: var(--color-gray-mid);
-            padding: 5px 15px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .toggle-btn.active {
-            color: var(--color-white);
-            background: #1a1a1a;
-        }
-
-        #map-2d-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        /* --- OVERLAYS --- */
         .vignette {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.7) 100%);
             pointer-events: none;
             z-index: 2;
         }
 
-        .scan-line {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.03);
-            pointer-events: none;
-            z-index: 3;
-            animation: scanning 10s linear infinite;
+        /* --- CONTROLS --- */
+        #ui-controls {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: auto;
+            display: flex;
+            gap: 2px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            padding: 2px;
         }
 
-        @keyframes scanning { 0% { top: 0; } 100% { top: 100%; } }
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 20px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-        .chart-container { height: 120px; margin-top: 10px; }
+        .control-btn:hover { color: #fff; background: #111; }
+        .control-btn.active { color: #000; background: #fff; font-weight: 600; }
+
+        .chart-box { height: 130px; width: 100%; }
+
+        /* --- SCANLINE EFFECT --- */
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 5;
+            background: linear-gradient(0deg, rgba(0, 255, 120, 0.02) 0%, transparent 100%);
+            position: absolute;
+            top: -100px;
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: -100px; }
+            100% { top: 100%; }
+        }
+
     </style>
 </head>
 <body>
 
-    <div id="viewport-container">
-        <div id="globe-3d"></div>
-        <div id="map-2d-container">
-            <!-- 2D Map representation using Canvas/SVG -->
-            <canvas id="map2d"></canvas>
-        </div>
-    </div>
-
+    <div id="globe-viz"></div>
     <div class="vignette"></div>
-    <div class="scan-line"></div>
+    <div class="scanline"></div>
 
-    <div id="view-toggle">
-        <button class="toggle-btn active" onclick="switchView('3d')">3D PROJECTION</button>
-        <button class="toggle-btn" onclick="switchView('2d')">2D MERCATOR</button>
+    <div id="ui-controls">
+        <button id="btn-3d" class="control-btn active" onclick="setView('3d')">3D SPHERE</button>
+        <button id="btn-2d" class="control-btn" onclick="setView('2d')">2D PROJECTION</button>
     </div>
 
-    <div id="app">
+    <div id="app-interface">
         <header>
-            <div class="header-brand">
-                <div class="status-dot"></div>
-                <span>CYBER-INTELLIGENCE CENTER // CORE_v4</span>
+            <div class="header-title">
+                <i data-lucide="shield" size="18" color="#00FF78"></i>
+                <span>Global Threat Intelligence // System Monitor</span>
             </div>
-            <div id="clock-utc">00:00:00 UTC</div>
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <div class="live-indicator">
+                    <div class="pulse-dot"></div>
+                    <span class="mono">LIVE DATA STREAM</span>
+                </div>
+                <div id="clock-utc" class="mono" style="font-size: 11px;">00:00:00 UTC</div>
+            </div>
         </header>
 
-        <aside class="left-panel">
+        <aside class="nav-left">
             <div class="module">
-                <div class="module-header">THREAT METRICS</div>
-                <div style="display: flex; justify-content: space-between;">
-                    <div>
-                        <div class="stat-value" id="count-attacks">124,092</div>
-                        <div class="stat-label">Active Attacks</div>
+                <div class="module-label">
+                    <span>Threat Statistics</span>
+                    <i data-lucide="activity" size="12"></i>
+                </div>
+                <div class="metric-group">
+                    <div class="metric-card">
+                        <span class="metric-value" id="attack-count">482,109</span>
+                        <span class="metric-sub">Daily Events</span>
                     </div>
-                    <div style="text-align: right;">
-                        <div class="stat-value">9.2</div>
-                        <div class="stat-label">Risk Level</div>
+                    <div class="metric-card">
+                        <span class="metric-value" style="color: var(--accent-green)">8.4</span>
+                        <span class="metric-sub">Risk Factor</span>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="leftChart"></canvas>
+                <div class="chart-box">
+                    <canvas id="mainChart"></canvas>
                 </div>
             </div>
 
             <div class="module">
-                <div class="module-header">VECTOR DISTRIBUTION</div>
-                <div style="font-family: var(--font-mono); font-size: 10px; color: var(--color-gray-mid);">
-                    <div style="margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                            <span>NETWORK LAYER</span><span>62%</span>
+                <div class="module-label">
+                    <span>Vector Distribution</span>
+                    <i data-lucide="pie-chart" size="12"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="vector-row">
+                        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;">
+                            <span class="mono">CLOUD_RESOURCES</span>
+                            <span class="mono">42%</span>
                         </div>
-                        <div style="height: 1px; background: #222;"><div style="width: 62%; height: 100%; background: #fff;"></div></div>
+                        <div style="width:100%; height:2px; background:#111;">
+                            <div style="width:42%; height:100%; background:var(--accent-green);"></div>
+                        </div>
                     </div>
-                    <div style="margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                            <span>APPLICATION</span><span>24%</span>
+                    <div class="vector-row">
+                        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;">
+                            <span class="mono">ENDPOINT_ASSETS</span>
+                            <span class="mono">28%</span>
                         </div>
-                        <div style="height: 1px; background: #222;"><div style="width: 24%; height: 100%; background: #777;"></div></div>
+                        <div style="width:100%; height:2px; background:#111;">
+                            <div style="width:28%; height:100%; background:#777;"></div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                            <span>DATABASE</span><span>14%</span>
+                    <div class="vector-row">
+                        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;">
+                            <span class="mono">IOT_INFRA</span>
+                            <span class="mono">18%</span>
                         </div>
-                        <div style="height: 1px; background: #222;"><div style="width: 14%; height: 100%; background: #444;"></div></div>
+                        <div style="width:100%; height:2px; background:#111;">
+                            <div style="width:18%; height:100%; background:#444;"></div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="module">
+                <div class="module-label">
+                    <span>Regional Hotspots</span>
+                </div>
+                <table style="width: 100%; font-size: 10px; border-collapse: collapse; font-family: var(--font-mono);">
+                    <tr style="color: var(--text-dim); border-bottom: 1px solid #111;">
+                        <td style="padding: 8px 0;">REGION</td>
+                        <td style="padding: 8px 0; text-align: right;">INTENSITY</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0;">NORTH AMERICA</td>
+                        <td style="padding: 8px 0; text-align: right; color: var(--accent-green);">HIGH</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0;">EAST ASIA</td>
+                        <td style="padding: 8px 0; text-align: right; color: var(--accent-green);">CRITICAL</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0;">EUROPE</td>
+                        <td style="padding: 8px 0; text-align: right; color: #fff;">MODERATE</td>
+                    </tr>
+                </table>
             </div>
         </aside>
 
-        <main><!-- Center remains clear for protagonist --></main>
+        <main style="grid-area: viewport;"></main>
 
-        <aside class="right-panel">
+        <aside class="nav-right">
             <div class="module" style="height: 100%; display: flex; flex-direction: column;">
-                <div class="module-header">
-                    <span>INCIDENT FEED</span>
-                    <span class="status-dot" style="width: 4px; height: 4px;"></span>
+                <div class="module-label">
+                    <span>Active Incident Feed</span>
+                    <i data-lucide="zap" size="12"></i>
                 </div>
-                <div id="feed" style="flex: 1; overflow-y: hidden;">
-                    <!-- Feed items -->
+                <div id="feed-container" style="flex: 1; overflow-y: hidden;">
+                    <!-- Real-time updates -->
                 </div>
-                <div class="chart-container">
-                    <canvas id="rightChart"></canvas>
+                <div class="module-label" style="margin-top: 20px;">
+                    <span>System Integrity</span>
+                </div>
+                <div class="chart-box" style="height: 100px;">
+                    <canvas id="miniChart"></canvas>
                 </div>
             </div>
         </aside>
 
         <footer>
-            <div>COORD: <span id="mouse-coords">0.00, 0.00</span></div>
-            <div>STATUS: ENCRYPTED_STREAM // NODE: MASTER-01</div>
-            <div id="uptime">UPTIME: 00:00:00</div>
+            <div style="display: flex; gap: 30px;">
+                <span>LOC: <span id="ui-lat">0.00</span> / <span id="ui-lng">0.00</span></span>
+                <span>ASSETS: 14,291 ONLINE</span>
+            </div>
+            <div style="display: flex; gap: 30px;">
+                <span>ENC: AES-256-GCM</span>
+                <span>AUTH: ROOT_ACCESS</span>
+                <span id="uptime-clock">UPTIME: 00:00:00</span>
+            </div>
         </footer>
     </div>
 
     <script>
-        // --- GLOBE 3D LOGIC (Native Three.js for reliability) ---
-        let scene, camera, renderer, globe, clouds, arcs = [], controls;
-        const container = document.getElementById('globe-3d');
+        // --- CONFIG & INITIALIZATION ---
+        lucide.createIcons();
+        const clockEl = document.getElementById('clock-utc');
+        const uptimeEl = document.getElementById('uptime-clock');
+        const startTime = Date.now();
 
-        function init3D() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 250;
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-            scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(5, 3, 5);
-            scene.add(directionalLight);
-
-            // Sphere
-            const geometry = new THREE.SphereGeometry(100, 64, 64);
+        function updateClocks() {
+            const now = new Date();
+            clockEl.innerText = now.toISOString().split('T')[1].split('.')[0] + ' UTC';
             
-            // Texture with dark style
-            const textureLoader = new THREE.TextureLoader();
-            const earthTexture = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-dark.jpg');
-            const bumpMap = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-topology.png');
+            const diff = Math.floor((Date.now() - startTime) / 1000);
+            const h = Math.floor(diff / 3600).toString().padStart(2, '0');
+            const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+            const s = (diff % 60).toString().padStart(2, '0');
+            uptimeEl.innerText = `UPTIME: ${h}:${m}:${s}`;
+        }
+        setInterval(updateClocks, 1000);
 
-            const material = new THREE.MeshStandardMaterial({
-                color: 0x444444,
-                map: earthTexture,
-                bumpMap: bumpMap,
-                bumpScale: 1,
-                metalness: 0.1,
-                roughness: 0.8,
+        // --- GLOBE ENGINE ---
+        let world;
+        const globeContainer = document.getElementById('globe-viz');
+        
+        // High-res geojson for perfectly defined continents and borders
+        const GEOJSON_URL = 'https://unpkg.com/world-atlas@2.0.2/countries-110m.json';
+
+        function initGlobe() {
+            world = Globe()
+                (globeContainer)
+                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+                .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+                .backgroundColor('#000000')
+                .showAtmosphere(true)
+                .atmosphereColor('#ffffff')
+                .atmosphereAltitude(0.15)
+                .arcColor(() => '#00FF78')
+                .arcDashLength(0.5)
+                .arcDashGap(2)
+                .arcDashAnimateTime(1500)
+                .arcStroke(0.5)
+                .ringColor(() => '#00FF78')
+                .ringMaxRadius(2.5)
+                .ringPropagationSpeed(3)
+                .ringRepeatPeriod(800);
+
+            // Fetch and set polygons for perfectly defined borders
+            fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson')
+                .then(res => res.json())
+                .then(countries => {
+                    world.polygonsData(countries.features)
+                        .polygonCapColor(() => 'rgba(255, 255, 255, 0.03)')
+                        .polygonSideColor(() => 'rgba(255, 255, 255, 0.05)')
+                        .polygonStrokeColor(() => '#444444'); // Border color
+                });
+
+            // Adjust camera & size
+            world.pointOfView({ lat: 20, lng: 0, altitude: 2.2 });
+            world.controls().autoRotate = true;
+            world.controls().autoRotateSpeed = 0.6;
+            world.controls().enableDamping = true;
+            world.controls().dampingFactor = 0.05;
+
+            // Size listener
+            window.addEventListener('resize', () => {
+                world.width(window.innerWidth);
+                world.height(window.innerHeight);
             });
-
-            globe = new THREE.Mesh(geometry, material);
-            scene.add(globe);
-
-            // Wireframe overlay for tech look
-            const wireframe = new THREE.Mesh(
-                new THREE.SphereGeometry(100.2, 40, 40),
-                new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.03 })
-            );
-            scene.add(wireframe);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 0.5;
-            controls.enablePan = false;
-            controls.minDistance = 150;
-            controls.maxDistance = 400;
-
-            animate();
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            if (controls) controls.update();
-            updateArcs();
-            renderer.render(scene, camera);
-        }
+        // --- SIMULATION & DATA ---
+        const attackTypes = ["DDoS_FLOOD", "SQL_INJECTION", "SYSTEM_PENETRATION", "RANSOMWARE_PUSH", "XSS_EXPLOIT", "BRUTE_FORCE"];
+        const feedContainer = document.getElementById('feed-container');
 
-        // --- ARCS / ATTACKS 3D ---
-        function createArc() {
-            const startLat = (Math.random() - 0.5) * 160;
-            const startLng = (Math.random() - 0.5) * 360;
-            const endLat = (Math.random() - 0.5) * 160;
-            const endLng = (Math.random() - 0.5) * 360;
-
-            const startPos = latLngToVector3(startLat, startLng, 100);
-            const endPos = latLngToVector3(endLat, endLng, 100);
-
-            // Curve
-            const dist = startPos.distanceTo(endPos);
-            const midPos = startPos.clone().lerp(endPos, 0.5).normalize().multiplyScalar(100 + dist * 0.2);
-            const curve = new THREE.QuadraticBezierCurve3(startPos, midPos, endPos);
+        function generateAttack() {
+            // Generate random coordinates
+            const startLat = (Math.random() - 0.5) * 140;
+            const startLng = (Math.random() - 0.5) * 320;
+            const endLat = (Math.random() - 0.5) * 140;
+            const endLng = (Math.random() - 0.5) * 320;
             
-            const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(50));
-            const material = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 });
-            const line = new THREE.Line(geometry, material);
-            
-            scene.add(line);
-            
-            // Traveling particle
-            const pGeom = new THREE.SphereGeometry(0.4, 8, 8);
-            const pMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const particle = new THREE.Mesh(pGeom, pMat);
-            scene.add(particle);
+            const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
 
-            arcs.push({
-                line, particle, curve, progress: 0, 
-                speed: 0.005 + Math.random() * 0.01,
-                onComplete: () => {
-                    scene.remove(line);
-                    scene.remove(particle);
-                }
-            });
+            // Add Arc to Globe
+            const currentArcs = world.arcsData();
+            const newArc = {
+                startLat, startLng, endLat, endLng,
+                label: type
+            };
+            world.arcsData([...currentArcs.slice(-40), newArc]);
 
-            addIncident(startLat, startLng, endLat, endLng);
-        }
+            // Add Ring to Globe
+            const currentRings = world.ringsData();
+            world.ringsData([...currentRings.slice(-20), { lat: endLat, lng: endLng }]);
 
-        function updateArcs() {
-            for (let i = arcs.length - 1; i >= 0; i--) {
-                const arc = arcs[i];
-                arc.progress += arc.speed;
-                if (arc.progress >= 1) {
-                    arc.onComplete();
-                    arcs.splice(i, 1);
-                } else {
-                    const pos = arc.curve.getPoint(arc.progress);
-                    arc.particle.position.copy(pos);
-                    arc.line.material.opacity = Math.sin(arc.progress * Math.PI) * 0.5;
-                }
-            }
-        }
-
-        function latLngToVector3(lat, lng, radius) {
-            const phi = (90 - lat) * (Math.PI / 180);
-            const theta = (lng + 180) * (Math.PI / 180);
-            return new THREE.Vector3(
-                -radius * Math.sin(phi) * Math.cos(theta),
-                radius * Math.cos(phi),
-                radius * Math.sin(phi) * Math.sin(theta)
-            );
-        }
-
-        // --- 2D MAP LOGIC ---
-        const canvas2d = document.getElementById('map2d');
-        const ctx2d = canvas2d.getContext('2d');
-
-        function init2D() {
-            canvas2d.width = window.innerWidth;
-            canvas2d.height = window.innerHeight;
-            draw2DBase();
-        }
-
-        function draw2DBase() {
-            ctx2d.fillStyle = '#000';
-            ctx2d.fillRect(0, 0, canvas2d.width, canvas2d.height);
-            
-            // Draw grid
-            ctx2d.strokeStyle = '#111';
-            ctx2d.lineWidth = 1;
-            const step = 40;
-            for(let x=0; x<canvas2d.width; x+=step) { ctx2d.beginPath(); ctx2d.moveTo(x,0); ctx2d.lineTo(x,canvas2d.height); ctx2d.stroke(); }
-            for(let y=0; y<canvas2d.height; y+=step) { ctx2d.beginPath(); ctx2d.moveTo(0,y); ctx2d.lineTo(canvas2d.width,y); ctx2d.stroke(); }
-
-            // Label
-            ctx2d.fillStyle = '#333';
-            ctx2d.font = '10px IBM Plex Mono';
-            ctx2d.fillText('MERCATOR_PROJECTION_v1.0', 320, 60);
-        }
-
-        function switchView(type) {
-            const container3d = document.getElementById('globe-3d');
-            const container2d = document.getElementById('map-2d-container');
-            const btns = document.querySelectorAll('.toggle-btn');
-            
-            btns.forEach(b => b.classList.remove('active'));
-            if(type === '3d') {
-                container3d.style.display = 'block';
-                container2d.style.display = 'none';
-                container2d.style.opacity = '0';
-                btns[0].classList.add('active');
-            } else {
-                container3d.style.display = 'none';
-                container2d.style.display = 'flex';
-                setTimeout(() => container2d.style.opacity = '1', 10);
-                btns[1].classList.add('active');
-                init2D();
-            }
-        }
-
-        // --- UI & FEED ---
-        const feed = document.getElementById('feed');
-        const types = ["DDoS_FLOOD", "SQL_INJECT", "XSS_SCRIPT", "RANSOM_SCAN", "AUTH_BRUTE"];
-
-        function addIncident(slat, slng, elat, elng) {
-            const type = types[Math.floor(Math.random() * types.length)];
-            const time = new Date().toISOString().split('T')[1].split('.')[0];
+            // Update Feed
             const item = document.createElement('div');
             item.className = 'incident-item';
+            const time = new Date().toISOString().split('T')[1].split('.')[0];
             item.innerHTML = `
-                <div style="display:flex;justify-content:space-between;font-size:9px;">
-                    <span style="color:#fff">${type}</span>
-                    <span style="color:#444">${time}</span>
+                <div class="incident-header">
+                    <span class="incident-type">${type}</span>
+                    <span class="mono">${time}</span>
                 </div>
-                <span class="incident-info">SRC: ${slat.toFixed(2)},${slng.toFixed(2)} -> DST: INT_NODE_${Math.floor(Math.random()*9)}</span>
-                <div class="incident-meta"><span>SEV: HIGH</span><span>PROT: TCP</span></div>
+                <span class="incident-target">SOURCE: ${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.XX.XX → NODE_ID: ${Math.floor(Math.random()*999)}</span>
+                <div class="incident-meta">
+                    <span>SEV: ${Math.random() > 0.8 ? 'CRITICAL' : 'HIGH'}</span>
+                    <span>PROTO: TCP/SSL</span>
+                </div>
             `;
-            feed.prepend(item);
-            if(feed.children.length > 12) feed.removeChild(feed.lastChild);
-            
-            const count = document.getElementById('count-attacks');
-            count.innerText = (parseInt(count.innerText.replace(',','')) + 1).toLocaleString();
+            feedContainer.prepend(item);
+            if (feedContainer.children.length > 15) feedContainer.removeChild(feedContainer.lastChild);
+
+            // Update Stat
+            const countEl = document.getElementById('attack-count');
+            const val = parseInt(countEl.innerText.replace(/,/g, ''));
+            countEl.innerText = (val + 1).toLocaleString();
         }
 
-        // --- CHARTS & BOOT ---
-        window.onload = () => {
-            init3D();
-            lucide.createIcons();
+        function setView(mode) {
+            const btn3d = document.getElementById('btn-3d');
+            const btn2d = document.getElementById('btn-2d');
             
-            // Charts
-            const chartCfg = (color) => ({
+            if (mode === '2d') {
+                world.pointOfView({ lat: 0, lng: 0, altitude: 4 }, 1000);
+                setTimeout(() => {
+                    world.controls().enableRotate = false;
+                    world.controls().autoRotate = false;
+                }, 1000);
+                btn2d.classList.add('active');
+                btn3d.classList.remove('active');
+            } else {
+                world.controls().enableRotate = true;
+                world.controls().autoRotate = true;
+                world.pointOfView({ lat: 20, lng: 0, altitude: 2.2 }, 1000);
+                btn3d.classList.add('active');
+                btn2d.classList.remove('active');
+            }
+        }
+
+        // --- CHARTS ---
+        function initCharts() {
+            const ctx1 = document.getElementById('mainChart').getContext('2d');
+            new Chart(ctx1, {
                 type: 'line',
-                data: { labels: Array(10).fill(''), datasets: [{ data: Array(10).fill(0).map(()=>Math.random()*100), borderColor: color, borderWidth: 1, pointRadius: 0, fill: true, backgroundColor: 'rgba(255,255,255,0.02)', tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+                data: {
+                    labels: Array(20).fill(''),
+                    datasets: [{
+                        data: Array(20).fill(0).map(() => 40 + Math.random() * 60),
+                        borderColor: '#00FF78',
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 255, 120, 0.05)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { grid: { color: '#111' }, ticks: { display: false } }
+                    }
+                }
             });
-            new Chart(document.getElementById('leftChart'), chartCfg('#fff'));
-            new Chart(document.getElementById('rightChart'), chartCfg('#777'));
 
-            // Simulation
-            setInterval(() => { if(arcs.length < 40) createArc(); }, 800);
+            const ctx2 = document.getElementById('miniChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: Array(15).fill(''),
+                    datasets: [{
+                        data: Array(15).fill(0).map(() => Math.random() * 100),
+                        backgroundColor: '#333',
+                        hoverBackgroundColor: '#00FF78',
+                        barThickness: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- BOOTSTRAP ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initGlobe();
+            initCharts();
             
-            // Clock & Uptime
-            const start = Date.now();
-            setInterval(() => {
-                document.getElementById('clock-utc').innerText = new Date().toISOString().split('T')[1].split('.')[0] + ' UTC';
-                const s = Math.floor((Date.now()-start)/1000);
-                const h = Math.floor(s/3600).toString().padStart(2,'0');
-                const m = Math.floor((s%3600)/60).toString().padStart(2,'0');
-                const sec = (s%60).toString().padStart(2,'0');
-                document.getElementById('uptime').innerText = `UPTIME: ${h}:${m}:${sec}`;
-            }, 1000);
-        };
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            if(canvas2d.style.display !== 'none') init2D();
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth * 360 - 180).toFixed(2);
-            const y = (0.5 - e.clientY / window.innerHeight * 180).toFixed(2);
-            document.getElementById('mouse-coords').innerText = `${y}, ${x}`;
+            // Simulation intervals
+            setInterval(generateAttack, 1500);
+            
+            // Mouse track
+            window.addEventListener('mousemove', e => {
+                const lat = (0.5 - e.clientY / window.innerHeight) * 180;
+                const lng = (e.clientX / window.innerWidth - 0.5) * 360;
+                document.getElementById('ui-lat').innerText = lat.toFixed(2);
+                document.getElementById('ui-lng').innerText = lng.toFixed(2);
+            });
         });
 
     </script>
