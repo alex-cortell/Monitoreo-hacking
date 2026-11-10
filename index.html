@@ -3,573 +3,709 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEMA GLOBAL THREAT MONITOR // ENTERPRISE EDITION</title>
+    <title>SEC-OPS PRIME // GLOBAL THREAT INTELLIGENCE PLATFORM</title>
     
-    <!-- Fonts -->
+    <!-- Professional Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Dependencies -->
+    <!-- Professional Map & 3D Libraries -->
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
+    <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
+    <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
+    
+    <!-- Data Viz & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            --bg-deep: #000000;
-            --bg-panel: rgba(10, 10, 10, 0.85);
+            --bg-obsidian: #000000;
+            --bg-surface: #0a0a0a;
+            --bg-panel: rgba(13, 13, 13, 0.9);
             --accent-green: #00FF78;
-            --accent-green-dim: #00B85A;
-            --border-color: #222222;
-            --text-primary: #FFFFFF;
-            --text-secondary: #777777;
-            --text-dim: #444444;
+            --accent-green-low: rgba(0, 255, 120, 0.2);
+            --border-primary: #1a1a1a;
+            --border-secondary: #262626;
+            --text-high: #FFFFFF;
+            --text-mid: #888888;
+            --text-low: #444444;
             --font-main: 'Inter', sans-serif;
             --font-mono: 'IBM Plex Mono', monospace;
+            --sidebar-width: 340px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
+            outline: none;
         }
 
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-primary);
+            background-color: var(--bg-obsidian);
+            color: var(--text-high);
             font-family: var(--font-main);
-            overflow: hidden;
             height: 100vh;
             width: 100vw;
-        }
-
-        /* --- UI STRUCTURE --- */
-        #app-interface {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: grid;
-            grid-template-columns: 320px 1fr 350px;
-            grid-template-rows: 50px 1fr 40px;
-            grid-template-areas: 
-                "header header header"
-                "nav-left viewport nav-right"
-                "footer footer footer";
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        header, aside, footer {
-            pointer-events: auto;
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border-color);
-        }
-
-        header {
-            grid-area: header;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 25px;
-            background: rgba(0, 0, 0, 0.8);
-            border-top: none;
-            border-left: none;
-            border-right: none;
-        }
-
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .live-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 9px;
-            color: var(--accent-green);
-        }
-
-        .pulse-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
-            animation: pulse-green 2s infinite;
-        }
-
-        @keyframes pulse-green {
-            0% { opacity: 0.3; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0.3; transform: scale(0.9); }
-        }
-
-        /* --- PANELS --- */
-        aside {
-            padding: 25px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 30px;
-            background: var(--bg-panel);
-            overflow-y: auto;
-            scrollbar-width: none;
         }
-        aside::-webkit-scrollbar { display: none; }
 
-        .nav-left { grid-area: nav-left; border-top: none; border-bottom: none; border-left: none; }
-        .nav-right { grid-area: nav-right; border-top: none; border-bottom: none; border-right: none; }
-
-        footer {
-            grid-area: footer;
+        /* --- LAYOUT ARCHITECTURE --- */
+        #app-header {
+            height: 54px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-primary);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 25px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-secondary);
-            background: rgba(0, 0, 0, 0.9);
-            border-bottom: none;
-            border-left: none;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        #main-container {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-primary);
+            display: flex;
+            flex-direction: column;
+            z-index: 90;
+            backdrop-filter: blur(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-right {
             border-right: none;
+            border-left: 1px solid var(--border-primary);
+        }
+
+        #viewport-area {
+            flex: 1;
+            position: relative;
+            background: #000;
+        }
+
+        /* --- COMPONENTS --- */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 2px;
+            background: #111;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-mid);
+            padding: 6px 14px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .nav-btn.active {
+            background: #222;
+            color: var(--text-high);
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: #1a1a1a;
+            color: var(--text-high);
         }
 
         /* --- MODULES --- */
         .module {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-primary);
         }
 
-        .module-label {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .module-header {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid #1a1a1a;
-            padding-bottom: 8px;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
-        .metric-group {
+        .module-title {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-mid);
+        }
+
+        .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
 
-        .metric-card {
+        .stat-box {
             display: flex;
             flex-direction: column;
         }
 
-        .metric-value {
+        .stat-val {
             font-family: var(--font-mono);
-            font-size: 24px;
-            color: var(--text-primary);
+            font-size: 20px;
+            color: var(--text-high);
         }
 
-        .metric-sub {
+        .stat-label {
             font-size: 9px;
-            color: var(--text-dim);
+            color: var(--text-low);
             text-transform: uppercase;
             margin-top: 4px;
         }
 
-        /* --- INCIDENT FEED --- */
-        .incident-item {
+        /* --- LIVE FEED --- */
+        #live-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+        }
+
+        .feed-item {
             padding: 12px 0;
-            border-bottom: 1px solid #111;
+            border-bottom: 1px solid #141414;
             font-family: var(--font-mono);
-            transition: all 0.2s;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .incident-item:hover {
-            background: rgba(255,255,255,0.02);
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        .incident-header {
+        .feed-item-top {
             display: flex;
             justify-content: space-between;
             font-size: 10px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
-        .incident-type { color: var(--accent-green); font-weight: 600; }
-        .incident-target { font-size: 11px; color: var(--text-primary); display: block; margin-bottom: 4px; }
-        .incident-meta { display: flex; gap: 12px; font-size: 9px; color: var(--text-dim); }
-
-        /* --- GLOBE VIEWPORT --- */
-        #globe-viz {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
+        .severity-high { color: var(--accent-green); }
+        .feed-item-details {
+            font-size: 11px;
+            color: var(--text-mid);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .vignette {
-            position: fixed;
+        /* --- MAP & GLOBE CONTAINERS --- */
+        .view-container {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.7) 100%);
-            pointer-events: none;
-            z-index: 2;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
 
-        /* --- CONTROLS --- */
-        #ui-controls {
+        .view-container.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* --- CVE & INTEL PANELS --- */
+        .content-panel {
             position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            pointer-events: auto;
-            display: flex;
-            gap: 2px;
-            background: #000;
-            border: 1px solid var(--border-color);
-            padding: 2px;
-        }
-
-        .control-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 8px 20px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .control-btn:hover { color: #fff; background: #111; }
-        .control-btn.active { color: #000; background: #fff; font-weight: 600; }
-
-        .chart-box { height: 130px; width: 100%; }
-
-        /* --- SCANLINE EFFECT --- */
-        .scanline {
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 100px;
-            z-index: 5;
-            background: linear-gradient(0deg, rgba(0, 255, 120, 0.02) 0%, transparent 100%);
+            height: 100%;
+            background: var(--bg-obsidian);
+            z-index: 150;
+            display: none;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        .table-container {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table-container th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid var(--border-primary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-mid);
+            text-transform: uppercase;
+        }
+
+        .table-container td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-primary);
+            font-size: 13px;
+            color: var(--text-high);
+        }
+
+        /* --- CUSTOM SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #333; }
+
+        /* --- STATUS FOOTER --- */
+        #app-footer {
+            height: 32px;
+            background: #050505;
+            border-top: 1px solid var(--border-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-low);
+        }
+
+        .btn-action {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-action:hover { opacity: 0.8; }
+
+        /* HUD Overlay Elements */
+        .hud-top-right {
             position: absolute;
-            top: -100px;
-            pointer-events: none;
-            animation: scan 8s linear infinite;
+            top: 20px;
+            right: 20px;
+            z-index: 80;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        @keyframes scan {
-            0% { top: -100px; }
-            100% { top: 100%; }
+        .hud-card {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--border-primary);
+            padding: 12px;
+            backdrop-filter: blur(10px);
         }
-
     </style>
 </head>
 <body>
 
-    <div id="globe-viz"></div>
-    <div class="vignette"></div>
-    <div class="scanline"></div>
+    <header id="app-header">
+        <div class="brand">
+            <i data-lucide="shield-check" color="#00FF78"></i>
+            <span>SEC-OPS // GLOBAL THREAT INTEL</span>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchMainTab('dashboard')">Operations</button>
+            <button class="nav-btn" onclick="switchMainTab('intel')">Threat Intel</button>
+            <button class="nav-btn" onclick="switchMainTab('cve')">CVE Database</button>
+            <button class="nav-btn" onclick="switchMainTab('mitre')">MITRE ATT&CK</button>
+        </div>
 
-    <div id="ui-controls">
-        <button id="btn-3d" class="control-btn active" onclick="setView('3d')">3D SPHERE</button>
-        <button id="btn-2d" class="control-btn" onclick="setView('2d')">2D PROJECTION</button>
-    </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div id="system-clock" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-mid);">00:00:00 UTC</div>
+            <button class="btn-action">EXPORT REPORT</button>
+        </div>
+    </header>
 
-    <div id="app-interface">
-        <header>
-            <div class="header-title">
-                <i data-lucide="shield" size="18" color="#00FF78"></i>
-                <span>Global Threat Intelligence // System Monitor</span>
-            </div>
-            <div style="display: flex; gap: 40px; align-items: center;">
-                <div class="live-indicator">
-                    <div class="pulse-dot"></div>
-                    <span class="mono">LIVE DATA STREAM</span>
-                </div>
-                <div id="clock-utc" class="mono" style="font-size: 11px;">00:00:00 UTC</div>
-            </div>
-        </header>
-
-        <aside class="nav-left">
+    <div id="main-container">
+        <!-- Sidebar Left: Global Metrics -->
+        <aside class="sidebar sidebar-left">
             <div class="module">
-                <div class="module-label">
-                    <span>Threat Statistics</span>
-                    <i data-lucide="activity" size="12"></i>
+                <div class="module-header">
+                    <span class="module-title">Risk Assessment</span>
+                    <i data-lucide="activity" size="12" color="#888"></i>
                 </div>
-                <div class="metric-group">
-                    <div class="metric-card">
-                        <span class="metric-value" id="attack-count">482,109</span>
-                        <span class="metric-sub">Daily Events</span>
-                    </div>
-                    <div class="metric-card">
-                        <span class="metric-value" style="color: var(--accent-green)">8.4</span>
-                        <span class="metric-sub">Risk Factor</span>
-                    </div>
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <span style="font-family: var(--font-mono); font-size: 32px; color: var(--accent-green);">8.4</span>
+                    <span style="font-size: 10px; color: var(--text-low);">/ 10 CRITICAL</span>
                 </div>
-                <div class="chart-box">
-                    <canvas id="mainChart"></canvas>
+                <div style="height: 4px; background: #111; margin-top: 15px;">
+                    <div style="width: 84%; height: 100%; background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green);"></div>
                 </div>
             </div>
 
             <div class="module">
-                <div class="module-label">
-                    <span>Vector Distribution</span>
-                    <i data-lucide="pie-chart" size="12"></i>
+                <div class="module-header"><span class="module-title">Threat Metrics</span></div>
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <span class="stat-val" id="total-events">1,429,081</span>
+                        <span class="stat-label">Total Events</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-val" style="color: var(--accent-green);">12.4k</span>
+                        <span class="stat-label">Active Attacks</span>
+                    </div>
                 </div>
+                <div style="height: 120px; margin-top: 20px;">
+                    <canvas id="threatChart"></canvas>
+                </div>
+            </div>
+
+            <div class="module">
+                <div class="module-header"><span class="module-title">Target Classification</span></div>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div class="vector-row">
-                        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;">
-                            <span class="mono">CLOUD_RESOURCES</span>
-                            <span class="mono">42%</span>
+                    <div class="target-row">
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px;">
+                            <span>FINANCIAL SERVICES</span><span>42%</span>
                         </div>
-                        <div style="width:100%; height:2px; background:#111;">
-                            <div style="width:42%; height:100%; background:var(--accent-green);"></div>
+                        <div style="height: 2px; background: #111;"><div style="width: 42%; height: 100%; background: #fff;"></div></div>
+                    </div>
+                    <div class="target-row">
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px;">
+                            <span>GOVERNMENT INFRA</span><span>28%</span>
+                        </div>
+                        <div style="height: 2px; background: #111;"><div style="width: 28%; height: 100%; background: #888;"></div></div>
+                    </div>
+                    <div class="target-row">
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px;">
+                            <span>HEALTHCARE</span><span>18%</span>
+                        </div>
+                        <div style="height: 2px; background: #111;"><div style="width: 18%; height: 100%; background: #444;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Viewport Area: Map and Globe -->
+        <section id="viewport-area">
+            <div class="hud-top-right">
+                <div class="nav-tabs hud-card">
+                    <button class="nav-btn active" id="view-3d-btn" onclick="switchView('3d')">3D Globe</button>
+                    <button class="nav-btn" id="view-2d-btn" onclick="switchView('2d')">2D Map</button>
+                </div>
+                <div class="hud-card" style="font-family: var(--font-mono); font-size: 10px;">
+                    <div style="color: var(--text-low); margin-bottom: 5px;">CURSOR COORDS</div>
+                    <div id="lat-lng-display">0.0000, 0.0000</div>
+                </div>
+            </div>
+
+            <div id="globe-container" class="view-container active"></div>
+            <div id="map-container" class="view-container"></div>
+
+            <!-- Content Panels for other tabs -->
+            <div id="panel-intel" class="content-panel">
+                <h1 style="font-family: var(--font-mono); margin-bottom: 20px;">Threat Intelligence Engine</h1>
+                <div style="display: flex; gap: 10px; margin-bottom: 40px;">
+                    <input type="text" placeholder="Search IP, Domain, Hash..." style="flex:1; background: #111; border: 1px solid #222; color: #fff; padding: 12px; font-family: var(--font-mono);">
+                    <button class="btn-action">ANALYZE INDICATOR</button>
+                </div>
+                <div class="stat-grid">
+                    <div class="hud-card">
+                        <div class="module-title">Top Threat Actors</div>
+                        <div style="margin-top: 15px; font-size: 13px;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #111;"><span>APT28 (Fancy Bear)</span><span class="severity-high">HIGH</span></div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #111;"><span>Lazarus Group</span><span class="severity-high">CRITICAL</span></div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #111;"><span>LockBit 3.0</span><span class="severity-high">HIGH</span></div>
                         </div>
                     </div>
-                    <div class="vector-row">
-                        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;">
-                            <span class="mono">ENDPOINT_ASSETS</span>
-                            <span class="mono">28%</span>
-                        </div>
-                        <div style="width:100%; height:2px; background:#111;">
-                            <div style="width:28%; height:100%; background:#777;"></div>
-                        </div>
-                    </div>
-                    <div class="vector-row">
-                        <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;">
-                            <span class="mono">IOT_INFRA</span>
-                            <span class="mono">18%</span>
-                        </div>
-                        <div style="width:100%; height:2px; background:#111;">
-                            <div style="width:18%; height:100%; background:#444;"></div>
+                    <div class="hud-card">
+                        <div class="module-title">Latest Malicious Hashes</div>
+                        <div style="margin-top: 15px; font-family: var(--font-mono); font-size: 11px;">
+                            <div style="padding: 6px 0; color: var(--text-mid);">e3b0c44298fc1c149afbf4c8996fb924...</div>
+                            <div style="padding: 6px 0; color: var(--text-mid);">2cf24dba5fb0a30e26e83b2ac5b9e29e...</div>
+                            <div style="padding: 6px 0; color: var(--text-mid);">7528880a986701aa940177a06f654b4a...</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="module">
-                <div class="module-label">
-                    <span>Regional Hotspots</span>
-                </div>
-                <table style="width: 100%; font-size: 10px; border-collapse: collapse; font-family: var(--font-mono);">
-                    <tr style="color: var(--text-dim); border-bottom: 1px solid #111;">
-                        <td style="padding: 8px 0;">REGION</td>
-                        <td style="padding: 8px 0; text-align: right;">INTENSITY</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0;">NORTH AMERICA</td>
-                        <td style="padding: 8px 0; text-align: right; color: var(--accent-green);">HIGH</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0;">EAST ASIA</td>
-                        <td style="padding: 8px 0; text-align: right; color: var(--accent-green);">CRITICAL</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0;">EUROPE</td>
-                        <td style="padding: 8px 0; text-align: right; color: #fff;">MODERATE</td>
-                    </tr>
+            <div id="panel-cve" class="content-panel">
+                <h1 style="font-family: var(--font-mono); margin-bottom: 20px;">CVE Vulnerability Database</h1>
+                <table class="table-container">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Severity</th>
+                            <th>CVSS</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cve-table-body">
+                        <!-- Dynamic CVEs -->
+                    </tbody>
                 </table>
             </div>
-        </aside>
 
-        <main style="grid-area: viewport;"></main>
+            <div id="panel-mitre" class="content-panel">
+                <h1 style="font-family: var(--font-mono); margin-bottom: 20px;">MITRE ATT&CK Matrix</h1>
+                <p style="color: var(--text-mid); margin-bottom: 30px;">Techniques and tactics observed in current campaign trends.</p>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                    <div class="hud-card"><div class="module-title">Initial Access</div><div style="font-size: 11px; margin-top:10px;">Phishing, Valid Accounts, Exploit Public-Facing Application</div></div>
+                    <div class="hud-card"><div class="module-title">Execution</div><div style="font-size: 11px; margin-top:10px;">Command and Scripting Interpreter, PowerShell, WMI</div></div>
+                    <div class="hud-card"><div class="module-title">Persistence</div><div style="font-size: 11px; margin-top:10px;">Registry Run Keys, Scheduled Task, Account Manipulation</div></div>
+                    <div class="hud-card"><div class="module-title">Exfiltration</div><div style="font-size: 11px; margin-top:10px;">Exfiltration Over C2 Channel, Scheduled Transfer</div></div>
+                </div>
+            </div>
+        </section>
 
-        <aside class="nav-right">
-            <div class="module" style="height: 100%; display: flex; flex-direction: column;">
-                <div class="module-label">
-                    <span>Active Incident Feed</span>
-                    <i data-lucide="zap" size="12"></i>
+        <!-- Sidebar Right: Live Events -->
+        <aside class="sidebar sidebar-right">
+            <div class="module">
+                <div class="module-header">
+                    <span class="module-title">Live Event Stream</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="stat-label">LIVE</span>
+                        <div style="width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 5px var(--accent-green);"></div>
+                    </div>
                 </div>
-                <div id="feed-container" style="flex: 1; overflow-y: hidden;">
-                    <!-- Real-time updates -->
+                <div id="live-feed">
+                    <!-- Events will be injected here -->
                 </div>
-                <div class="module-label" style="margin-top: 20px;">
-                    <span>System Integrity</span>
-                </div>
-                <div class="chart-box" style="height: 100px;">
-                    <canvas id="miniChart"></canvas>
+            </div>
+            
+            <div class="module" style="border-bottom: none;">
+                <div class="module-header"><span class="module-title">Origin Analysis</span></div>
+                <div style="height: 150px;">
+                    <canvas id="originRadar"></canvas>
                 </div>
             </div>
         </aside>
-
-        <footer>
-            <div style="display: flex; gap: 30px;">
-                <span>LOC: <span id="ui-lat">0.00</span> / <span id="ui-lng">0.00</span></span>
-                <span>ASSETS: 14,291 ONLINE</span>
-            </div>
-            <div style="display: flex; gap: 30px;">
-                <span>ENC: AES-256-GCM</span>
-                <span>AUTH: ROOT_ACCESS</span>
-                <span id="uptime-clock">UPTIME: 00:00:00</span>
-            </div>
-        </footer>
     </div>
 
+    <footer id="app-footer">
+        <div style="display: flex; gap: 20px;">
+            <span>NODE_ID: P-ALPHA-09</span>
+            <span>DATA_LATENCY: 12ms</span>
+            <span>SRC_STATUS: <span style="color: var(--accent-green);">SYNCHRONIZED</span></span>
+        </div>
+        <div style="display: flex; gap: 20px;">
+            <span>CRYPTO_STRENGTH: AES-GCM-256</span>
+            <span style="color: var(--text-mid);">© 2024 SEC-OPS PRIME. ALL RIGHTS RESERVED.</span>
+        </div>
+    </footer>
+
     <script>
-        // --- CONFIG & INITIALIZATION ---
+        // --- GLOBAL STATE & CONFIG ---
+        const state = {
+            currentTab: 'dashboard',
+            currentView: '3d', // '3d' or '2d'
+            globe: null,
+            map: null,
+            threatData: [],
+            cves: [
+                { id: 'CVE-2024-21626', sev: 'CRITICAL', score: '9.8', desc: 'runc container breakout vulnerability', date: '2024-02-01' },
+                { id: 'CVE-2024-23897', sev: 'HIGH', score: '8.4', desc: 'Jenkins arbitrary file read vulnerability', date: '2024-01-24' },
+                { id: 'CVE-2023-46604', sev: 'CRITICAL', score: '10.0', desc: 'Apache ActiveMQ RCE vulnerability', date: '2023-11-01' },
+                { id: 'CVE-2024-20253', sev: 'HIGH', score: '8.8', desc: 'Cisco Unity Connection RCE', date: '2024-02-12' },
+                { id: 'CVE-2023-49606', sev: 'CRITICAL', score: '9.1', desc: 'Tinyproxy Use-After-Free RCE', date: '2024-05-01' }
+            ]
+        };
+
         lucide.createIcons();
-        const clockEl = document.getElementById('clock-utc');
-        const uptimeEl = document.getElementById('uptime-clock');
-        const startTime = Date.now();
 
-        function updateClocks() {
+        // --- CLOCK ---
+        function updateClock() {
             const now = new Date();
-            clockEl.innerText = now.toISOString().split('T')[1].split('.')[0] + ' UTC';
-            
-            const diff = Math.floor((Date.now() - startTime) / 1000);
-            const h = Math.floor(diff / 3600).toString().padStart(2, '0');
-            const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
-            const s = (diff % 60).toString().padStart(2, '0');
-            uptimeEl.innerText = `UPTIME: ${h}:${m}:${s}`;
+            document.getElementById('system-clock').innerText = now.toUTCString().split(' ')[4] + ' UTC';
         }
-        setInterval(updateClocks, 1000);
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // --- GLOBE ENGINE ---
-        let world;
-        const globeContainer = document.getElementById('globe-viz');
-        
-        // High-res geojson for perfectly defined continents and borders
-        const GEOJSON_URL = 'https://unpkg.com/world-atlas@2.0.2/countries-110m.json';
-
+        // --- 3D GLOBE CONTROLLER ---
         function initGlobe() {
-            world = Globe()
-                (globeContainer)
+            const container = document.getElementById('globe-container');
+            state.globe = Globe()
+                (container)
                 .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-                .backgroundColor('#000000')
+                .backgroundColor('rgba(0,0,0,0)')
                 .showAtmosphere(true)
-                .atmosphereColor('#ffffff')
-                .atmosphereAltitude(0.15)
+                .atmosphereColor('#00FF78')
+                .atmosphereAltitude(0.12)
                 .arcColor(() => '#00FF78')
-                .arcDashLength(0.5)
-                .arcDashGap(2)
-                .arcDashAnimateTime(1500)
-                .arcStroke(0.5)
+                .arcDashLength(0.4)
+                .arcDashGap(4)
+                .arcDashAnimateTime(2000)
+                .arcStroke(0.4)
                 .ringColor(() => '#00FF78')
-                .ringMaxRadius(2.5)
+                .ringMaxRadius(3)
                 .ringPropagationSpeed(3)
-                .ringRepeatPeriod(800);
+                .ringRepeatPeriod(1000);
 
-            // Fetch and set polygons for perfectly defined borders
-            fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson')
-                .then(res => res.json())
-                .then(countries => {
-                    world.polygonsData(countries.features)
-                        .polygonCapColor(() => 'rgba(255, 255, 255, 0.03)')
-                        .polygonSideColor(() => 'rgba(255, 255, 255, 0.05)')
-                        .polygonStrokeColor(() => '#444444'); // Border color
-                });
+            state.globe.controls().autoRotate = true;
+            state.globe.controls().autoRotateSpeed = 0.5;
+            state.globe.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
 
-            // Adjust camera & size
-            world.pointOfView({ lat: 20, lng: 0, altitude: 2.2 });
-            world.controls().autoRotate = true;
-            world.controls().autoRotateSpeed = 0.6;
-            world.controls().enableDamping = true;
-            world.controls().dampingFactor = 0.05;
-
-            // Size listener
             window.addEventListener('resize', () => {
-                world.width(window.innerWidth);
-                world.height(window.innerHeight);
+                state.globe.width(container.offsetWidth);
+                state.globe.height(container.offsetHeight);
             });
         }
 
-        // --- SIMULATION & DATA ---
-        const attackTypes = ["DDoS_FLOOD", "SQL_INJECTION", "SYSTEM_PENETRATION", "RANSOMWARE_PUSH", "XSS_EXPLOIT", "BRUTE_FORCE"];
-        const feedContainer = document.getElementById('feed-container');
+        // --- 2D MAP CONTROLLER ---
+        function initMap() {
+            // Using MapLibre with CartoDB Dark Matter tiles (No API key required)
+            state.map = new maplibregl.Map({
+                container: 'map-container',
+                style: {
+                    version: 8,
+                    sources: {
+                        'base-tiles': {
+                            type: 'raster',
+                            tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'],
+                            tileSize: 256,
+                            attribution: '© CartoDB'
+                        }
+                    },
+                    layers: [{
+                        id: 'base-layer',
+                        type: 'raster',
+                        source: 'base-tiles'
+                    }]
+                },
+                center: [0, 20],
+                zoom: 1.5
+            });
 
-        function generateAttack() {
-            // Generate random coordinates
-            const startLat = (Math.random() - 0.5) * 140;
-            const startLng = (Math.random() - 0.5) * 320;
-            const endLat = (Math.random() - 0.5) * 140;
-            const endLng = (Math.random() - 0.5) * 320;
-            
-            const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
-
-            // Add Arc to Globe
-            const currentArcs = world.arcsData();
-            const newArc = {
-                startLat, startLng, endLat, endLng,
-                label: type
-            };
-            world.arcsData([...currentArcs.slice(-40), newArc]);
-
-            // Add Ring to Globe
-            const currentRings = world.ringsData();
-            world.ringsData([...currentRings.slice(-20), { lat: endLat, lng: endLng }]);
-
-            // Update Feed
-            const item = document.createElement('div');
-            item.className = 'incident-item';
-            const time = new Date().toISOString().split('T')[1].split('.')[0];
-            item.innerHTML = `
-                <div class="incident-header">
-                    <span class="incident-type">${type}</span>
-                    <span class="mono">${time}</span>
-                </div>
-                <span class="incident-target">SOURCE: ${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.XX.XX → NODE_ID: ${Math.floor(Math.random()*999)}</span>
-                <div class="incident-meta">
-                    <span>SEV: ${Math.random() > 0.8 ? 'CRITICAL' : 'HIGH'}</span>
-                    <span>PROTO: TCP/SSL</span>
-                </div>
-            `;
-            feedContainer.prepend(item);
-            if (feedContainer.children.length > 15) feedContainer.removeChild(feedContainer.lastChild);
-
-            // Update Stat
-            const countEl = document.getElementById('attack-count');
-            const val = parseInt(countEl.innerText.replace(/,/g, ''));
-            countEl.innerText = (val + 1).toLocaleString();
+            state.map.on('mousemove', (e) => {
+                document.getElementById('lat-lng-display').innerText = `${e.lngLat.lat.toFixed(4)}, ${e.lngLat.lng.toFixed(4)}`;
+            });
         }
 
-        function setView(mode) {
-            const btn3d = document.getElementById('btn-3d');
-            const btn2d = document.getElementById('btn-2d');
+        // --- DATA SIMULATION ENGINE ---
+        const attackTypes = ["DDoS_FLOOD", "SQL_INJECTION", "RANSOMWARE_BEACON", "BRUTE_FORCE_SSH", "XSS_PAYLOAD", "C2_CALLBACK"];
+        const countries = [
+            { lat: 40.7, lng: -74, name: "US-EAST" },
+            { lat: 35.6, lng: 139, name: "JP-TOKYO" },
+            { lat: 51.5, lng: -0.1, name: "UK-LON" },
+            { lat: 39.9, lng: 116, name: "CN-BEI" },
+            { lat: -23.5, lng: -46.6, name: "BR-SAO" },
+            { lat: 55.7, lng: 37.6, name: "RU-MOS" }
+        ];
+
+        function triggerIncident() {
+            const src = countries[Math.floor(Math.random() * countries.length)];
+            const dst = countries[Math.floor(Math.random() * countries.length)];
+            if (src === dst) return;
+
+            const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
+            const id = Math.random().toString(16).slice(2, 8).toUpperCase();
+
+            // Add to Globe
+            if (state.globe) {
+                const arcs = state.globe.arcsData();
+                state.globe.arcsData([...arcs.slice(-30), { startLat: src.lat, startLng: src.lng, endLat: dst.lat, endLng: dst.lng }]);
+                
+                const rings = state.globe.ringsData();
+                state.globe.ringsData([...rings.slice(-15), { lat: dst.lat, lng: dst.lng }]);
+            }
+
+            // Add to Feed
+            const feed = document.getElementById('live-feed');
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            const item = document.createElement('div');
+            item.className = 'feed-item';
+            item.innerHTML = `
+                <div class="feed-item-top">
+                    <span class="severity-high">${type}</span>
+                    <span style="color: var(--text-low);">${time}</span>
+                </div>
+                <div class="feed-item-details">#${id} SRC: ${src.name} → DST: ${dst.name}</div>
+            `;
+            feed.prepend(item);
+            if (feed.children.length > 15) feed.removeChild(feed.lastChild);
+
+            // Update Statistics
+            const totalEl = document.getElementById('total-events');
+            let val = parseInt(totalEl.innerText.replace(/,/g, ''));
+            totalEl.innerText = (val + 1).toLocaleString();
+        }
+
+        // --- TAB & VIEW SWITCHING ---
+        function switchMainTab(tab) {
+            state.currentTab = tab;
             
-            if (mode === '2d') {
-                world.pointOfView({ lat: 0, lng: 0, altitude: 4 }, 1000);
-                setTimeout(() => {
-                    world.controls().enableRotate = false;
-                    world.controls().autoRotate = false;
-                }, 1000);
-                btn2d.classList.add('active');
-                btn3d.classList.remove('active');
+            // UI Update
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+            
+            // Select correct nav btn (global)
+            event.target.classList.add('active');
+
+            if (tab === 'dashboard') {
+                // Return to map/globe view
             } else {
-                world.controls().enableRotate = true;
-                world.controls().autoRotate = true;
-                world.pointOfView({ lat: 20, lng: 0, altitude: 2.2 }, 1000);
-                btn3d.classList.add('active');
-                btn2d.classList.remove('active');
+                document.getElementById(`panel-${tab}`).classList.add('active');
             }
         }
 
-        // --- CHARTS ---
+        function switchView(view) {
+            state.currentView = view;
+            
+            const gCont = document.getElementById('globe-container');
+            const mCont = document.getElementById('map-container');
+            const gBtn = document.getElementById('view-3d-btn');
+            const mBtn = document.getElementById('view-2d-btn');
+
+            if (view === '3d') {
+                gCont.classList.add('active');
+                mCont.classList.remove('active');
+                gBtn.classList.add('active');
+                mBtn.classList.remove('active');
+            } else {
+                mCont.classList.add('active');
+                gCont.classList.remove('active');
+                mBtn.classList.add('active');
+                gBtn.classList.remove('active');
+                if (state.map) state.map.resize();
+            }
+        }
+
+        // --- CHARTS INITIALIZATION ---
         function initCharts() {
-            const ctx1 = document.getElementById('mainChart').getContext('2d');
+            // Threat Trend Line
+            const ctx1 = document.getElementById('threatChart').getContext('2d');
             new Chart(ctx1, {
                 type: 'line',
                 data: {
                     labels: Array(20).fill(''),
                     datasets: [{
-                        data: Array(20).fill(0).map(() => 40 + Math.random() * 60),
+                        data: Array(20).fill(0).map(() => 10 + Math.random() * 50),
                         borderColor: '#00FF78',
                         borderWidth: 1.5,
                         pointRadius: 0,
@@ -589,16 +725,18 @@
                 }
             });
 
-            const ctx2 = document.getElementById('miniChart').getContext('2d');
+            // Origin Radar
+            const ctx2 = document.getElementById('originRadar').getContext('2d');
             new Chart(ctx2, {
-                type: 'bar',
+                type: 'radar',
                 data: {
-                    labels: Array(15).fill(''),
+                    labels: ['AMER', 'APAC', 'EMEA', 'LATAM', 'AFRICA'],
                     datasets: [{
-                        data: Array(15).fill(0).map(() => Math.random() * 100),
-                        backgroundColor: '#333',
-                        hoverBackgroundColor: '#00FF78',
-                        barThickness: 4
+                        label: 'Volume',
+                        data: [80, 95, 60, 40, 30],
+                        borderColor: '#00FF78',
+                        backgroundColor: 'rgba(0, 255, 120, 0.1)',
+                        borderWidth: 1
                     }]
                 },
                 options: {
@@ -606,28 +744,49 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { display: false },
-                        y: { display: false }
+                        r: {
+                            grid: { color: '#222' },
+                            angleLines: { color: '#222' },
+                            pointLabels: { color: '#888', font: { size: 9 } },
+                            ticks: { display: false }
+                        }
                     }
                 }
+            });
+        }
+
+        // --- CVE POPULATION ---
+        function populateCVEs() {
+            const body = document.getElementById('cve-table-body');
+            state.cves.forEach(cve => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-family: var(--font-mono); color: var(--accent-green);">${cve.id}</td>
+                    <td><span style="background: #200; color: #f55; padding: 2px 6px; font-size: 10px; border-radius: 2px;">${cve.sev}</span></td>
+                    <td style="font-family: var(--font-mono);">${cve.score}</td>
+                    <td style="color: var(--text-mid);">${cve.desc}</td>
+                    <td style="font-family: var(--font-mono); font-size: 11px;">${cve.date}</td>
+                `;
+                body.appendChild(row);
             });
         }
 
         // --- BOOTSTRAP ---
         window.addEventListener('DOMContentLoaded', () => {
             initGlobe();
+            initMap();
             initCharts();
+            populateCVEs();
             
-            // Simulation intervals
-            setInterval(generateAttack, 1500);
+            // Simulation loop
+            setInterval(triggerIncident, 1200);
             
-            // Mouse track
-            window.addEventListener('mousemove', e => {
-                const lat = (0.5 - e.clientY / window.innerHeight) * 180;
-                const lng = (e.clientX / window.innerWidth - 0.5) * 360;
-                document.getElementById('ui-lat').innerText = lat.toFixed(2);
-                document.getElementById('ui-lng').innerText = lng.toFixed(2);
-            });
+            // Initial view sizing
+            setTimeout(() => {
+                const container = document.getElementById('globe-container');
+                state.globe.width(container.offsetWidth);
+                state.globe.height(container.offsetHeight);
+            }, 100);
         });
 
     </script>
