@@ -130,6 +130,60 @@
         .leaflet-bar { border: 1px solid var(--border-primary) !important; box-shadow: none !important; border-radius: 0 !important; }
         .leaflet-bar a { background-color: #000 !important; color: var(--text-mid) !important; border-bottom: 1px solid var(--border-primary) !important; }
         .leaflet-bar a:hover { background-color: #111 !important; color: #fff !important; }
+
+        /* --- MAP 2D INTELLIGENCE CONTROLS --- */
+        .map-toolbox, .map-context, .map-legend, .map-status { position: absolute; z-index: 1100; background: rgba(0,0,0,0.92); border: 1px solid var(--border-secondary); box-shadow: 0 0 18px rgba(0,0,0,0.45); color: var(--text-mid); font-family: var(--font-mono); font-size: 10px; }
+        .map-toolbox { top: 18px; left: 18px; width: 220px; padding: 10px; }
+        .map-context { bottom: 18px; left: 18px; width: 250px; padding: 12px; }
+        .map-legend { right: 18px; bottom: 18px; padding: 10px; }
+        .map-status { left: 50%; bottom: 18px; transform: translateX(-50%); padding: 6px 10px; color: var(--accent-green); }
+        .map-control-title { color: var(--text-high); letter-spacing: 1px; margin-bottom: 8px; }
+        .map-search { display: flex; gap: 5px; margin-bottom: 8px; }
+        .map-toolbox input, .map-toolbox select { min-width: 0; width: 100%; background: #080808; border: 1px solid var(--border-secondary); color: var(--text-high); padding: 6px; font: inherit; }
+        .map-toolbox button { background: #080808; border: 1px solid var(--border-secondary); color: var(--text-mid); padding: 6px 8px; cursor: pointer; font: inherit; }
+        .map-toolbox button:hover, .map-toolbox button.active { color: var(--accent-green); border-color: var(--accent-green); }
+        .map-tool-row { display: flex; gap: 5px; margin-bottom: 8px; }
+        .map-tool-row > button { flex: 1; }
+        .map-filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .map-filter-grid label { display: flex; flex-direction: column; gap: 3px; color: var(--text-low); }
+        .map-layer-list { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 120px; overflow-y: auto; margin: 6px 0 8px; }
+        .map-layer-list label { display: flex; align-items: center; gap: 4px; color: var(--text-mid); }
+        .map-layer-list input { width: auto; accent-color: var(--accent-green); }
+        .map-layer-list input:disabled + span { color: var(--text-low); }
+        .map-context[hidden], .map-status[hidden] { display: none; }
+        .map-context-close { float: right; background: transparent; border: 0; color: var(--text-mid); cursor: pointer; }
+        .map-context-value { color: var(--text-high); margin-bottom: 5px; }
+        .map-legend-item { display: flex; align-items: center; gap: 6px; margin-top: 5px; }
+        .map-legend-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 7px var(--accent-green); }
+        .map-legend-line { width: 18px; border-top: 2px solid var(--accent-green); }
+        .map-legend-muted { color: var(--text-low); margin-top: 7px; }
+        #map-container:fullscreen { background: #000; }
+        .app-section { position: absolute; inset: 0; z-index: 20; display: none; overflow: auto; padding: 28px; background: #000; color: var(--text-mid); }
+        .app-section.active { display: block; }
+        .app-section-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .app-section-title { color: var(--text-high); font-family: var(--font-mono); font-size: 15px; letter-spacing: 2px; }
+        .app-section-subtitle { color: var(--text-low); font-size: 10px; margin-top: 7px; }
+        .app-section-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .app-section-card { background: rgba(10,10,10,0.92); border: 1px solid var(--border-primary); padding: 16px; min-height: 110px; }
+        .app-section-card.wide { grid-column: 1 / -1; }
+        .app-section-label { color: var(--text-low); font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; margin-bottom: 12px; }
+        .app-section-value { color: var(--accent-green); font-family: var(--font-mono); font-size: 20px; }
+        .app-section-form { display: flex; gap: 6px; margin-bottom: 12px; }
+        .app-section-form input, .app-section-form select { flex: 1; background: #080808; border: 1px solid var(--border-secondary); color: var(--text-high); padding: 8px; font: 11px var(--font-mono); min-width: 0; }
+        .app-section-form button { background: #080808; border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 12px; font: 11px var(--font-mono); cursor: pointer; }
+        .app-section-form button:hover { background: #10251a; }
+        .app-data-table { width: 100%; border-collapse: collapse; font: 10px var(--font-mono); }
+        .app-data-table th { color: var(--text-low); text-align: left; padding: 8px; border-bottom: 1px solid var(--border-secondary); }
+        .app-data-table td { color: var(--text-mid); padding: 10px 8px; border-bottom: 1px solid #141414; }
+        .app-empty { color: var(--text-low); padding: 14px 0; font: 10px var(--font-mono); }
+        .app-status { color: var(--accent-green); font: 10px var(--font-mono); min-height: 14px; }
+        @media (max-width: 700px) {
+            .map-toolbox { width: 190px; }
+            .map-context { width: 210px; }
+            .map-legend { display: none; }
+            .app-section-grid { grid-template-columns: 1fr; }
+            .app-section-card.wide { grid-column: auto; }
+        }
     </style>
 </head>
 <body>
@@ -141,10 +195,10 @@
         </div>
         
         <div class="nav-tabs">
-            <button class="nav-btn active">Operations</button>
-            <button class="nav-btn">Threat Intel</button>
-            <button class="nav-btn">CVE Database</button>
-            <button class="nav-btn">MITRE ATT&CK</button>
+            <button class="nav-btn active" id="nav-operations" data-app-section="operations" aria-controls="viewport-area">Operations</button>
+            <button class="nav-btn" id="nav-threat-intel" data-app-section="threat-intel" aria-controls="viewport-area">Threat Intel</button>
+            <button class="nav-btn" id="nav-cve" data-app-section="cve" aria-controls="viewport-area">CVE Database</button>
+            <button class="nav-btn" id="nav-mitre" data-app-section="mitre" aria-controls="viewport-area">MITRE ATT&CK</button>
         </div>
 
         <div style="display: flex; gap: 20px; align-items: center;">
@@ -214,8 +268,113 @@
 
             <!-- 2D Map Container -->
             <div id="map-container" class="view-container">
+                <div class="map-toolbox" aria-label="Controles de investigación del mapa">
+                    <div class="map-control-title">MAP INTELLIGENCE</div>
+                    <div class="map-search">
+                        <input id="map-search" type="search" placeholder="País o ciudad" aria-label="Buscar país o ciudad">
+                        <button id="map-search-button" type="button" title="Buscar">⌕</button>
+                    </div>
+                    <div class="map-tool-row">
+                        <button id="map-home" type="button">WORLD VIEW</button>
+                        <button id="map-fullscreen" type="button">FULLSCREEN</button>
+                    </div>
+                    <div class="map-control-title">LAYERS</div>
+                    <div class="map-layer-list">
+                        <label><input type="checkbox" data-map-layer="attacks" checked><span>Global attacks</span></label>
+                        <label><input type="checkbox" data-map-layer="critical" checked><span>Critical</span></label>
+                        <label><input type="checkbox" data-map-layer="ddos" checked><span>DDoS</span></label>
+                        <label><input type="checkbox" data-map-layer="ransomware" checked><span>Ransomware</span></label>
+                        <label><input type="checkbox" data-map-layer="malware" checked><span>Malware</span></label>
+                        <label><input type="checkbox" data-map-layer="suspicious" checked><span>Suspicious</span></label>
+                        <label><input type="checkbox" data-map-layer="infrastructure" checked><span>Infrastructure</span></label>
+                        <label><input type="checkbox" data-map-layer="affected" checked><span>Affected countries</span></label>
+                        <label><input type="checkbox" data-map-layer="ioc" checked><span>IoC</span></label>
+                    </div>
+                    <div class="map-control-title">FILTERS</div>
+                    <div class="map-filter-grid">
+                        <label>CONTINENT<select id="map-filter-continent"><option value="">All</option></select></label>
+                        <label>COUNTRY<select id="map-filter-country"><option value="">All</option></select></label>
+                        <label>THREAT<select id="map-filter-type"><option value="">All</option></select></label>
+                        <label>SEVERITY<select id="map-filter-severity"><option value="">All</option><option value="UNSPECIFIED">Not available</option></select></label>
+                        <label>FROM<input id="map-filter-from" type="date"></label>
+                        <label>TO<input id="map-filter-to" type="date"></label>
+                        <label>SOURCE<select id="map-filter-source"><option value="">All</option><option value="local incident stream">Local incident stream</option></select></label>
+                        <label>VERIFICATION<select id="map-filter-verification"><option value="">All</option><option value="NOT_PROVIDED">Not provided</option></select></label>
+                    </div>
+                    <div class="map-tool-row" style="margin-top: 8px; margin-bottom: 0;">
+                        <button id="map-clear-filters" type="button">CLEAR FILTERS</button>
+                    </div>
+                </div>
+                <div id="map-context" class="map-context" hidden></div>
+                <div class="map-legend">
+                    <div class="map-control-title">LEGEND</div>
+                    <div class="map-legend-item"><span class="map-legend-line"></span><span>Attack route</span></div>
+                    <div class="map-legend-item"><span class="map-legend-dot"></span><span>Active endpoint</span></div>
+                    <div class="map-legend-muted">Severity is shown only when supplied by the source.</div>
+                </div>
+                <div id="map-status" class="map-status" hidden></div>
                 <div class="leaflet-vignette"></div>
             </div>
+
+            <section id="section-threat-intel" class="app-section" aria-labelledby="nav-threat-intel">
+                <div class="app-section-header">
+                    <div><div class="app-section-title">THREAT INTELLIGENCE</div><div class="app-section-subtitle">INDICATOR INVESTIGATION WORKSPACE</div></div>
+                    <div class="app-status" id="intel-status">READY</div>
+                </div>
+                <div class="app-section-grid">
+                    <div class="app-section-card wide">
+                        <div class="app-section-label">INDICATOR SEARCH</div>
+                        <div class="app-section-form">
+                            <input id="intel-query" type="search" placeholder="IP, domain, URL or IOC" aria-label="Indicator to investigate">
+                            <select id="intel-kind" aria-label="Indicator type"><option value="auto">Auto detect</option><option value="ip">IP</option><option value="domain">Domain / URL</option><option value="ioc">IOC</option></select>
+                            <button id="intel-search" type="button">INVESTIGATE</button>
+                        </div>
+                        <div id="intel-result" class="app-empty">No indicator investigated.</div>
+                    </div>
+                    <div class="app-section-card"><div class="app-section-label">REPUTATION</div><div id="intel-reputation" class="app-empty">Awaiting an indicator.</div></div>
+                    <div class="app-section-card"><div class="app-section-label">THREAT CONTEXT</div><div id="intel-context" class="app-empty">Awaiting an indicator.</div></div>
+                    <div class="app-section-card wide"><div class="app-section-label">INVESTIGATION HISTORY</div><div id="intel-history" class="app-empty">No investigations in this session.</div></div>
+                </div>
+            </section>
+
+            <section id="section-cve" class="app-section" aria-labelledby="nav-cve">
+                <div class="app-section-header">
+                    <div><div class="app-section-title">CVE DATABASE</div><div class="app-section-subtitle">VULNERABILITY RESEARCH WORKSPACE</div></div>
+                    <div class="app-status" id="cve-status">READY</div>
+                </div>
+                <div class="app-section-grid">
+                    <div class="app-section-card wide">
+                        <div class="app-section-label">CVE SEARCH AND FILTERS</div>
+                        <div class="app-section-form">
+                            <input id="cve-query" type="search" placeholder="CVE identifier or product" aria-label="CVE search">
+                            <select id="cve-severity" aria-label="CVE severity"><option value="">All severities</option><option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
+                            <button id="cve-search" type="button">SEARCH</button>
+                        </div>
+                        <table class="app-data-table"><thead><tr><th>CVE ID</th><th>CVSS</th><th>SEVERITY</th><th>PUBLISHED</th><th>DESCRIPTION</th></tr></thead><tbody id="cve-results"><tr><td colspan="5" class="app-empty">No CVE data source is configured.</td></tr></tbody></table>
+                    </div>
+                    <div class="app-section-card"><div class="app-section-label">AFFECTED PRODUCTS</div><div class="app-empty">Displayed when documented CVE data is available.</div></div>
+                    <div class="app-section-card"><div class="app-section-label">OFFICIAL REFERENCES</div><div class="app-empty">Displayed when documented CVE data is available.</div></div>
+                </div>
+            </section>
+
+            <section id="section-mitre" class="app-section" aria-labelledby="nav-mitre">
+                <div class="app-section-header">
+                    <div><div class="app-section-title">MITRE ATT&amp;CK</div><div class="app-section-subtitle">TACTICS, TECHNIQUES AND DETECTIONS</div></div>
+                    <div class="app-status" id="mitre-status">READY</div>
+                </div>
+                <div class="app-section-grid">
+                    <div class="app-section-card wide">
+                        <div class="app-section-label">ATT&amp;CK SEARCH</div>
+                        <div class="app-section-form">
+                            <input id="mitre-query" type="search" placeholder="Technique, tactic or identifier" aria-label="MITRE ATT&CK search">
+                            <button id="mitre-search" type="button">SEARCH</button>
+                        </div>
+                        <table class="app-data-table"><thead><tr><th>IDENTIFIER</th><th>TACTIC</th><th>TECHNIQUE / SUBTECHNIQUE</th><th>DESCRIPTION</th></tr></thead><tbody id="mitre-results"><tr><td colspan="4" class="app-empty">No documented ATT&amp;CK data source is configured.</td></tr></tbody></table>
+                    </div>
+                    <div class="app-section-card"><div class="app-section-label">MITIGATIONS</div><div class="app-empty">Displayed when documented ATT&amp;CK data is available.</div></div>
+                    <div class="app-section-card"><div class="app-section-label">DETECTIONS / GROUPS</div><div class="app-empty">Displayed when documented ATT&amp;CK data is available.</div></div>
+                </div>
+            </section>
         </section>
 
         <!-- Sidebar Right -->
@@ -257,6 +416,27 @@
             globe: null,
             map: null,
             mapLayers: {},
+            mapCountryLayer: null,
+            mapIncidents: [],
+            mapIncidentLayers: new Map(),
+            mapCountries: [],
+            mapSelectedCountry: '',
+            mapStatusTimer: null,
+            appSection: 'operations',
+            mapFilters: {
+                layers: {
+                    attacks: true, critical: true, ddos: true, ransomware: true,
+                    malware: true, suspicious: true, infrastructure: true, affected: true, ioc: true
+                },
+                continent: '',
+                country: '',
+                type: '',
+                severity: '',
+                from: '',
+                to: '',
+                source: '',
+                verification: ''
+            },
             startTime: Date.now()
         };
 
@@ -323,22 +503,277 @@
         }
 
         // --- 2D MAP (Professional Cyber Style - Leaflet) ---
+        function showMapStatus(message) {
+            const status = document.getElementById('map-status');
+            status.innerText = message;
+            status.hidden = false;
+            clearTimeout(state.mapStatusTimer);
+            state.mapStatusTimer = setTimeout(() => { status.hidden = true; }, 3500);
+        }
+
+        function countryName(feature) {
+            return feature.properties.ADMIN || feature.properties.NAME || feature.properties.name || 'Unknown country';
+        }
+
+        function countryContinent(feature) {
+            return feature.properties.CONTINENT || feature.properties.continent || 'Unknown';
+        }
+
+        function mapCountryStyle(feature) {
+            const name = countryName(feature);
+            const selected = state.mapSelectedCountry === name;
+            return {
+                color: selected ? '#00FF78' : '#666',
+                weight: selected ? 1.5 : 0.7,
+                opacity: selected ? 0.95 : 0.7,
+                fillColor: selected ? '#143d29' : '#151515',
+                fillOpacity: selected ? 0.6 : 0.82
+            };
+        }
+
+        function incidentCategory(type) {
+            if (type === 'DDoS_FLOOD') return 'ddos';
+            if (type === 'MALWARE_PUSH') return 'malware';
+            return 'suspicious';
+        }
+
+        function incidentMatchesFilters(incident) {
+            const filters = state.mapFilters;
+            const locations = [incident.src, incident.dst];
+            if (filters.continent && !locations.some(location => location.continent === filters.continent)) return false;
+            if (filters.country && !locations.some(location => location.country === filters.country)) return false;
+            if (filters.type && incident.type !== filters.type) return false;
+            if (filters.severity && incident.severity !== filters.severity) return false;
+            if (filters.from && incident.date < filters.from) return false;
+            if (filters.to && incident.date > filters.to) return false;
+            if (filters.source && filters.source !== 'local incident stream') return false;
+            if (filters.verification && filters.verification !== 'NOT_PROVIDED') return false;
+            if (!filters.layers.attacks || !filters.layers[incidentCategory(incident.type)]) return false;
+            return true;
+        }
+
+        function curvedRoute(src, dst) {
+            const middleLat = (src.lat + dst.lat) / 2 + Math.max(8, Math.abs(src.lng - dst.lng) * 0.08);
+            const middleLng = (src.lng + dst.lng) / 2;
+            return Array.from({ length: 13 }, (_, index) => {
+                const t = index / 12;
+                const curve = 4 * t * (1 - t);
+                return [
+                    src.lat * (1 - t) + dst.lat * t + (middleLat - (src.lat + dst.lat) / 2) * curve,
+                    src.lng * (1 - t) + dst.lng * t + (middleLng - (src.lng + dst.lng) / 2) * curve
+                ];
+            });
+        }
+
+        function incidentPopup(incident) {
+            return `<div style="font-family:var(--font-mono);font-size:10px;color:#888">
+                <strong style="color:#00FF78">${incident.type}</strong><br>
+                ${incident.src.name} → ${incident.dst.name}<br>
+                SEVERITY: ${incident.severity}<br>
+                SOURCE: local incident stream
+            </div>`;
+        }
+
+        function renderMapIncidents() {
+            state.mapIncidentLayers.forEach(layers => layers.forEach(layer => state.map.removeLayer(layer)));
+            state.mapIncidentLayers.clear();
+            let visible = 0;
+            state.mapIncidents.forEach(incident => {
+                if (!incidentMatchesFilters(incident)) return;
+                visible += 1;
+                const layers = [];
+                const route = L.polyline.antPath(curvedRoute(incident.src, incident.dst), {
+                    color: '#00FF78',
+                    pulseColor: '#000',
+                    delay: 1500,
+                    weight: 2,
+                    opacity: 0.75
+                }).addTo(state.map);
+                route.bindTooltip(`${incident.type}: ${incident.src.name} → ${incident.dst.name}`, { sticky: true });
+                route.bindPopup(incidentPopup(incident));
+                route.on('click', () => setMapContext(incident));
+                layers.push(route);
+
+                if (state.mapFilters.layers.affected) {
+                    [incident.src, incident.dst].forEach((location, index) => {
+                        const marker = L.circleMarker([location.lat, location.lng], {
+                            radius: index === 0 ? 4 : 5,
+                            color: '#00FF78',
+                            fillColor: '#00FF78',
+                            fillOpacity: 0.85,
+                            weight: 1
+                        }).addTo(state.map);
+                        marker.bindTooltip(`${index === 0 ? 'ORIGIN' : 'DESTINATION'}: ${location.name}`, { sticky: true });
+                        marker.bindPopup(incidentPopup(incident));
+                        marker.on('click', () => setMapContext(incident));
+                        layers.push(marker);
+                    });
+                }
+                state.mapIncidentLayers.set(incident.id, layers);
+            });
+            document.getElementById('map-status').innerText = `${visible} INCIDENTS VISIBLE`;
+            document.getElementById('map-status').hidden = false;
+        }
+
+        function setMapContext(incident) {
+            const panel = document.getElementById('map-context');
+            panel.innerHTML = `<button class="map-context-close" type="button" aria-label="Close">×</button>
+                <div class="map-control-title">SELECTED ATTACK</div>
+                <div class="map-context-value">${incident.type}</div>
+                <div>${incident.src.name} → ${incident.dst.name}</div>
+                <div>SEVERITY: ${incident.severity}</div>
+                <div>VERIFICATION: NOT PROVIDED</div>
+                <div>SOURCE: local incident stream</div>`;
+            panel.hidden = false;
+            panel.querySelector('button').onclick = () => { panel.hidden = true; };
+        }
+
+        function setCountryContext(feature) {
+            const name = countryName(feature);
+            state.mapSelectedCountry = name;
+            state.mapCountryLayer?.resetStyle();
+            const related = state.mapIncidents.filter(incident =>
+                [incident.src.country, incident.dst.country].includes(name)
+            );
+            const threats = [...new Set(related.map(incident => incident.type))];
+            const panel = document.getElementById('map-context');
+            panel.innerHTML = `<button class="map-context-close" type="button" aria-label="Close">×</button>
+                <div class="map-control-title">SELECTED COUNTRY</div>
+                <div class="map-context-value">${name}</div>
+                <div>CONTINENT: ${countryContinent(feature)}</div>
+                <div>INCIDENTS REGISTERED: ${related.length}</div>
+                <div>THREATS DETECTED: ${threats.length ? threats.join(', ') : 'NO DATA'}</div>
+                <div>PREDOMINANT SEVERITY: ${related.length ? 'NOT PROVIDED' : 'NO DATA'}</div>
+                <div>SOURCES: ${related.length ? 'local incident stream' : 'NO DATA'}</div>`;
+            panel.hidden = false;
+            panel.querySelector('button').onclick = () => { panel.hidden = true; };
+            state.mapCountryLayer?.setStyle(mapCountryStyle);
+        }
+
+        function populateMapFilters() {
+            const select = (id, values) => {
+                const element = document.getElementById(id);
+                values.forEach(value => element.insertAdjacentHTML('beforeend', `<option value="${value}">${value}</option>`));
+            };
+            select('map-filter-continent', [...new Set(cities.map(city => city.continent))].sort());
+            select('map-filter-country', [...new Set(cities.map(city => city.country))].sort());
+            select('map-filter-type', attackTypes);
+        }
+
+        function searchMapLocation() {
+            const query = document.getElementById('map-search').value.trim().toLowerCase();
+            if (!query) return;
+            const city = cities.find(item => item.name.toLowerCase() === query || item.name.toLowerCase().includes(query));
+            if (city) {
+                state.map.setView([city.lat, city.lng], 6);
+                showMapStatus(`CENTERED ON ${city.name}`);
+                return;
+            }
+            const feature = state.mapCountries.find(item => countryName(item).toLowerCase().includes(query));
+            if (feature) {
+                const bounds = L.geoJSON(feature).getBounds();
+                state.map.fitBounds(bounds, { maxZoom: 5 });
+                setCountryContext(feature);
+                return;
+            }
+            showMapStatus('LOCATION NOT FOUND');
+            fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Search service unavailable');
+                    return response.json();
+                })
+                .then(results => {
+                    if (!results.length) throw new Error('Location not found');
+                    state.map.setView([Number(results[0].lat), Number(results[0].lon)], 8);
+                    showMapStatus(`CENTERED ON ${results[0].display_name.split(',')[0].toUpperCase()}`);
+                })
+                .catch(() => showMapStatus('SEARCH UNAVAILABLE - TRY A COUNTRY OR CITY'));
+        }
+
         function initMap() {
             state.map = L.map('map-container', {
                 center: [20, 0],
                 zoom: 2,
                 zoomControl: true,
-                attributionControl: false
+                attributionControl: false,
+                scrollWheelZoom: true,
+                worldCopyJump: true
             });
 
-            // OpenStreetMap tiles require no API key for basic visualization.
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19
             }).addTo(state.map);
+            L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(state.map);
 
             state.map.on('mousemove', (e) => {
                 document.getElementById('coord-display').innerText = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
             });
+            state.map.on('zoomend moveend', renderMapIncidents);
+            state.map.createPane('country-boundaries');
+            state.map.getPane('country-boundaries').style.zIndex = 390;
+
+            populateMapFilters();
+            document.querySelectorAll('[data-map-layer]').forEach(input => {
+                input.addEventListener('change', () => {
+                    state.mapFilters.layers[input.dataset.mapLayer] = input.checked;
+                    renderMapIncidents();
+                });
+            });
+            ['continent', 'country', 'type', 'severity', 'from', 'to', 'source', 'verification'].forEach(filter => {
+                document.getElementById(`map-filter-${filter}`).addEventListener('change', event => {
+                    state.mapFilters[filter] = event.target.value;
+                    renderMapIncidents();
+                });
+            });
+            document.getElementById('map-clear-filters').onclick = () => {
+                state.mapFilters.continent = '';
+                state.mapFilters.country = '';
+                state.mapFilters.type = '';
+                state.mapFilters.severity = '';
+                state.mapFilters.from = '';
+                state.mapFilters.to = '';
+                state.mapFilters.source = '';
+                state.mapFilters.verification = '';
+                ['continent', 'country', 'type', 'severity', 'from', 'to', 'source', 'verification'].forEach(filter => {
+                    document.getElementById(`map-filter-${filter}`).value = '';
+                });
+                renderMapIncidents();
+            };
+            document.getElementById('map-search-button').onclick = searchMapLocation;
+            document.getElementById('map-search').addEventListener('keydown', event => {
+                if (event.key === 'Enter') searchMapLocation();
+            });
+            document.getElementById('map-home').onclick = () => {
+                state.map.setView([20, 0], 2);
+                document.getElementById('map-context').hidden = true;
+            };
+            document.getElementById('map-fullscreen').onclick = () => {
+                const container = document.getElementById('map-container');
+                if (document.fullscreenElement) document.exitFullscreen();
+                else container.requestFullscreen().catch(() => showMapStatus('FULLSCREEN NOT AVAILABLE'));
+            };
+
+            fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson')
+                .then(response => {
+                    if (!response.ok) throw new Error('Country data unavailable');
+                    return response.json();
+                })
+                .then(countries => {
+                    state.mapCountries = countries.features;
+                    state.mapCountryLayer = L.geoJSON(state.mapCountries, {
+                        pane: 'country-boundaries',
+                        style: mapCountryStyle,
+                        onEachFeature: (feature, layer) => {
+                            layer.bindTooltip(countryName(feature), { sticky: true });
+                            layer.on({
+                                mouseover: event => event.target.setStyle({ color: '#00FF78', weight: 1.4, fillColor: '#143d29' }),
+                                mouseout: event => state.mapCountryLayer.resetStyle(event.target),
+                                click: () => setCountryContext(feature)
+                            });
+                        }
+                    }).addTo(state.map);
+                })
+                .catch(() => showMapStatus('COUNTRY BOUNDARIES UNAVAILABLE'));
         }
 
         // --- VIEW SWITCHER ---
@@ -365,16 +800,67 @@
             }
         }
 
+        function switchSection(section) {
+            state.appSection = section;
+            const operations = section === 'operations';
+            document.querySelectorAll('[data-app-section]').forEach(button => {
+                const active = button.dataset.appSection === section;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-current', active ? 'page' : 'false');
+            });
+            document.querySelectorAll('.app-section').forEach(panel => {
+                panel.classList.toggle('active', panel.id === `section-${section}`);
+            });
+            document.querySelector('.hud-top-right').style.display = operations ? '' : 'none';
+            document.getElementById('globe-container').classList.toggle('active', operations && state.view === '3d');
+            document.getElementById('map-container').classList.toggle('active', operations && state.view === '2d');
+            if (operations) switchView(state.view);
+        }
+
+        function initNavigation() {
+            document.querySelectorAll('[data-app-section]').forEach(button => {
+                button.addEventListener('click', () => switchSection(button.dataset.appSection));
+            });
+            document.getElementById('intel-search').addEventListener('click', () => {
+                const query = document.getElementById('intel-query').value.trim();
+                const status = document.getElementById('intel-status');
+                if (!query) {
+                    status.innerText = 'ENTER AN INDICATOR';
+                    return;
+                }
+                const kind = document.getElementById('intel-kind').value;
+                const detected = kind === 'auto'
+                    ? (/^https?:\/\//i.test(query) ? 'URL' : /^[\d.:]+$/.test(query) ? 'IP / NETWORK' : 'DOMAIN / IOC')
+                    : kind.toUpperCase();
+                document.getElementById('intel-result').innerText = `${detected}: ${query}`;
+                document.getElementById('intel-reputation').innerText = 'No reputation source configured.';
+                document.getElementById('intel-context').innerText = 'No threat intelligence source configured.';
+                const history = document.getElementById('intel-history');
+                history.innerText = history.innerText === 'No investigations in this session.'
+                    ? query
+                    : `${query} | ${history.innerText}`;
+                status.innerText = 'NO EXTERNAL DATA SOURCE';
+            });
+            document.getElementById('cve-search').addEventListener('click', () => {
+                const query = document.getElementById('cve-query').value.trim();
+                document.getElementById('cve-status').innerText = query ? 'NO CVE DATA SOURCE' : 'ENTER A CVE OR PRODUCT';
+            });
+            document.getElementById('mitre-search').addEventListener('click', () => {
+                const query = document.getElementById('mitre-query').value.trim();
+                document.getElementById('mitre-status').innerText = query ? 'NO ATT&CK DATA SOURCE' : 'ENTER A TECHNIQUE';
+            });
+        }
+
         // --- ATTACK SIMULATION ---
         const attackTypes = ["DDoS_FLOOD", "SQL_INJECTION", "MALWARE_PUSH", "XSS_ATTEMPT", "BRUTE_FORCE"];
         const cities = [
-            { lat: 40.7, lng: -74, name: "NEW YORK" },
-            { lat: 51.5, lng: -0.1, name: "LONDON" },
-            { lat: 35.6, lng: 139, name: "TOKYO" },
-            { lat: 39.9, lng: 116, name: "BEIJING" },
-            { lat: -33.8, lng: 151, name: "SYDNEY" },
-            { lat: 55.7, lng: 37.6, name: "MOSCOW" },
-            { lat: 1.35, lng: 103.8, name: "SINGAPORE" }
+            { lat: 40.7, lng: -74, name: "NEW YORK", country: "United States of America", continent: "North America" },
+            { lat: 51.5, lng: -0.1, name: "LONDON", country: "United Kingdom", continent: "Europe" },
+            { lat: 35.6, lng: 139, name: "TOKYO", country: "Japan", continent: "Asia" },
+            { lat: 39.9, lng: 116, name: "BEIJING", country: "China", continent: "Asia" },
+            { lat: -33.8, lng: 151, name: "SYDNEY", country: "Australia", continent: "Oceania" },
+            { lat: 55.7, lng: 37.6, name: "MOSCOW", country: "Russia", continent: "Europe" },
+            { lat: 1.35, lng: 103.8, name: "SINGAPORE", country: "Singapore", continent: "Asia" }
         ];
 
         function triggerIncident() {
@@ -383,6 +869,14 @@
             if (src === dst) return;
 
             const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
+            const incident = {
+                id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                src,
+                dst,
+                type,
+                severity: 'UNSPECIFIED',
+                date: new Date().toISOString().slice(0, 10)
+            };
 
             // Globe Update
             if (state.globe) {
@@ -394,21 +888,12 @@
 
             // Map Update (Leaflet AntPath for professional animated connections)
             if (state.map) {
-                const path = L.polyline.antPath([[src.lat, src.lng], [dst.lat, dst.lng]], {
-                    color: '#00FF78',
-                    pulseColor: '#000',
-                    delay: 1500,
-                    weight: 2,
-                    opacity: 0.6
-                }).addTo(state.map);
-                
-                const marker = L.circleMarker([dst.lat, dst.lng], {
-                    radius: 5,
-                    color: '#00FF78',
-                    fillOpacity: 0.8
-                }).addTo(state.map);
-
-                setTimeout(() => { state.map.removeLayer(path); state.map.removeLayer(marker); }, 4000);
+                state.mapIncidents.push(incident);
+                renderMapIncidents();
+                setTimeout(() => {
+                    state.mapIncidents = state.mapIncidents.filter(item => item.id !== incident.id);
+                    renderMapIncidents();
+                }, 4000);
             }
 
             // Feed Update
@@ -490,6 +975,7 @@
             initGlobe();
             initMap();
             initCharts();
+            initNavigation();
             setInterval(triggerIncident, 1500);
         });
 
