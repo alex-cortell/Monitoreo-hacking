@@ -3,52 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLOBAL CYBER THREAT INTELLIGENCE | SEC-OPS PRO</title>
+    <title>TERMINAL // GLOBAL CYBER THREAT INTELLIGENCE</title>
     
-    <!-- Professional Typography -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Professional Map & 3D Libraries -->
+    <!-- Professional 3D Engine -->
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
     
-    <!-- Leaflet for 2D Map (No API Key Required) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Professional 2D Engine (Leaflet) - No API Key Required -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
-    <!-- Data Viz & Icons -->
+    <!-- Icons & Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            --bg-obsidian: #000000;
-            --bg-surface: #0a0a0a;
-            --bg-panel: rgba(13, 13, 13, 0.95);
-            --accent-green: #00FF78;
-            --accent-green-low: rgba(0, 255, 120, 0.15);
-            --border-primary: #1a1a1a;
-            --border-secondary: #262626;
-            --text-high: #FFFFFF;
-            --text-mid: #888888;
-            --text-low: #444444;
+            --color-black: #000000;
+            --color-obsidian: #080808;
+            --color-surface: #0d0d0d;
+            --color-green: #00FF78;
+            --color-green-dim: rgba(0, 255, 120, 0.2);
+            --color-text-high: #FFFFFF;
+            --color-text-mid: #999999;
+            --color-text-low: #444444;
+            --border: 1px solid #1a1a1a;
             --font-main: 'Inter', sans-serif;
             --font-mono: 'IBM Plex Mono', monospace;
-            --sidebar-width: 340px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            outline: none;
         }
 
         body {
-            background-color: var(--bg-obsidian);
-            color: var(--text-high);
+            background-color: var(--color-black);
+            color: var(--color-text-high);
             font-family: var(--font-main);
             height: 100vh;
             width: 100vw;
@@ -57,11 +54,11 @@
             flex-direction: column;
         }
 
-        /* --- LAYOUT ARCHITECTURE --- */
+        /* --- HEADER --- */
         #app-header {
-            height: 54px;
-            background: var(--bg-surface);
-            border-bottom: 1px solid var(--border-primary);
+            height: 50px;
+            background: var(--color-obsidian);
+            border-bottom: var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -69,132 +66,171 @@
             z-index: 1000;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--color-green);
+            background: var(--color-green-dim);
+            padding: 4px 10px;
+            border-radius: 100px;
+        }
+
+        .pulse-dot {
+            width: 5px;
+            height: 5px;
+            background: var(--color-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+        /* --- MAIN LAYOUT --- */
         #main-container {
             flex: 1;
-            display: flex;
+            display: grid;
+            grid-template-columns: 320px 1fr 340px;
             position: relative;
             overflow: hidden;
         }
 
         .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border-primary);
+            background: var(--color-obsidian);
+            z-index: 100;
             display: flex;
             flex-direction: column;
-            z-index: 900;
-            backdrop-filter: blur(20px);
+            overflow-y: auto;
+            border-right: var(--border);
+            scrollbar-width: none;
         }
-
-        .sidebar-right {
-            border-right: none;
-            border-left: 1px solid var(--border-primary);
-        }
+        .sidebar::-webkit-scrollbar { display: none; }
+        .sidebar-right { border-right: none; border-left: var(--border); }
 
         #viewport-area {
-            flex: 1;
             position: relative;
             background: #000;
-        }
-
-        /* --- COMPONENTS --- */
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: var(--font-mono);
-            font-weight: 600;
-            letter-spacing: 1px;
-            font-size: 14px;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 4px;
-            background: #111;
-            padding: 4px;
-            border-radius: 4px;
-        }
-
-        .nav-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-mid);
-            padding: 8px 16px;
-            font-size: 11px;
-            font-family: var(--font-mono);
-            cursor: pointer;
-            border-radius: 3px;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .nav-btn.active {
-            background: #222;
-            color: var(--text-high);
+            overflow: hidden;
         }
 
         /* --- MODULES --- */
         .module {
-            padding: 24px;
-            border-bottom: 1px solid var(--border-primary);
-        }
-
-        .module-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
+            padding: 20px;
+            border-bottom: var(--border);
         }
 
         .module-title {
             font-family: var(--font-mono);
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-mid);
+            color: var(--color-text-mid);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            letter-spacing: 1px;
         }
 
-        .stat-val {
+        .stat-value {
             font-family: var(--font-mono);
             font-size: 24px;
-            color: var(--text-high);
+            color: var(--color-text-high);
             font-weight: 500;
         }
 
-        .stat-label {
+        .stat-sub {
             font-size: 9px;
-            color: var(--text-low);
+            color: var(--color-text-low);
             text-transform: uppercase;
-            margin-top: 6px;
-            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* --- VIEW CONTROLS (HUD) --- */
+        #hud-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hud-group {
+            background: rgba(0, 0, 0, 0.85);
+            border: var(--border);
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            gap: 4px;
+            backdrop-filter: blur(10px);
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-text-mid);
+            padding: 8px 16px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: #222;
+            color: var(--color-green);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            color: #fff;
         }
 
         /* --- LIVE FEED --- */
         #live-feed {
             flex: 1;
-            overflow-y: auto;
-            padding: 0 24px;
-            scrollbar-width: none;
-        }
-        #live-feed::-webkit-scrollbar { display: none; }
-
-        .feed-item {
-            padding: 14px 0;
-            border-bottom: 1px solid #141414;
+            padding: 0 20px;
             font-family: var(--font-mono);
         }
 
-        .severity-high { color: var(--accent-green); font-weight: 600; }
-        .feed-item-details {
-            font-size: 11px;
-            color: var(--text-mid);
-            margin-top: 4px;
+        .feed-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #141414;
         }
 
-        /* --- MAP & GLOBE CONTAINERS --- */
-        .view-container {
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            margin-bottom: 4px;
+        }
+
+        .feed-body {
+            font-size: 11px;
+            color: var(--color-text-mid);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .severity-badge {
+            color: var(--color-green);
+            font-weight: 600;
+        }
+
+        /* --- MAPS --- */
+        .map-wrapper {
             position: absolute;
             top: 0;
             left: 0;
@@ -202,114 +238,78 @@
             height: 100%;
             display: none;
         }
+        .map-wrapper.active { display: block; }
 
-        .view-container.active {
-            display: block;
-        }
-
-        /* Leaflet Specific Style Overrides */
+        /* Leaflet Fixes */
         .leaflet-container {
             background: #000 !important;
         }
-        .leaflet-bar a {
-            background-color: #111 !important;
-            color: #fff !important;
-            border-bottom: 1px solid #222 !important;
+        .leaflet-tile {
+            filter: grayscale(1) invert(1) brightness(0.15) contrast(1.5); /* Force dark mode on standard tiles or use CartoDB */
         }
+        /* Custom Leaflet style to avoid API key and look professional */
+        .custom-map-layer { filter: grayscale(100%) invert(100%) contrast(90%) brightness(20%); }
 
-        /* HUD Overlay */
-        .hud-top-right {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            z-index: 1000;
+        /* --- FOOTER --- */
+        #app-footer {
+            height: 30px;
+            background: var(--color-obsidian);
+            border-top: var(--border);
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--color-text-low);
+            z-index: 1000;
         }
 
-        .hud-card {
-            background: rgba(0,0,0,0.85);
-            border: 1px solid var(--border-primary);
-            padding: 16px;
-            backdrop-filter: blur(12px);
-            border-radius: 4px;
-        }
-
-        /* --- CONTENT PANELS --- */
-        .content-panel {
+        /* --- CVE TABS --- */
+        .tab-panel {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-obsidian);
+            background: var(--color-black);
             z-index: 1100;
             display: none;
-            padding: 60px;
+            padding: 40px;
             overflow-y: auto;
         }
-        .content-panel.active { display: block; }
+        .tab-panel.active { display: block; }
 
-        /* --- FOOTER --- */
-        #app-footer {
-            height: 36px;
-            background: #050505;
-            border-top: 1px solid var(--border-primary);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-low);
-            z-index: 1200;
+        .cve-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
         }
+        .cve-table th { text-align: left; padding: 12px; color: var(--color-text-mid); border-bottom: 2px solid #1a1a1a; font-family: var(--font-mono); font-size: 11px; }
+        .cve-table td { padding: 12px; border-bottom: 1px solid #111; }
+        .cve-id { color: var(--color-green); font-family: var(--font-mono); }
 
-        .btn-action {
-            background: var(--accent-green);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-size: 11px;
-            font-family: var(--font-mono);
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 2px;
-            text-transform: uppercase;
-        }
-
-        .pulse-live {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            box-shadow: 0 0 10px var(--accent-green);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
     </style>
 </head>
 <body>
 
     <header id="app-header">
-        <div class="brand">
-            <i data-lucide="shield-alert" color="#00FF78"></i>
-            <span>GLOBAL CYBER THREAT INTELLIGENCE</span>
+        <div class="header-left">
+            <i data-lucide="shield-check" color="#00FF78" size="18"></i>
+            <span>SEC-OPS PRO // GLOBAL THREAT MONITOR</span>
         </div>
         
-        <div class="nav-tabs">
-            <button class="nav-btn active" onclick="switchMainTab('dashboard')">Operations</button>
-            <button class="nav-btn" onclick="switchMainTab('intel')">Threat Intel</button>
-            <button class="nav-btn" onclick="switchMainTab('cve')">CVE Database</button>
+        <div class="nav-tabs" style="display:flex; gap:10px;">
+            <button class="toggle-btn active" onclick="switchNav('dash')">Operations</button>
+            <button class="toggle-btn" onclick="switchNav('cve')">CVE Database</button>
         </div>
 
-        <div style="display: flex; gap: 24px; align-items: center;">
-            <div id="system-clock" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-mid);">00:00:00 UTC</div>
-            <button class="btn-action">EXPORT SOC DATA</button>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="status-pill">
+                <div class="pulse-dot"></div>
+                SYSTEM ONLINE
+            </div>
+            <div id="clock" style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-mid);">00:00:00 UTC</div>
         </div>
     </header>
 
@@ -317,199 +317,177 @@
         <!-- Sidebar Left -->
         <aside class="sidebar sidebar-left">
             <div class="module">
-                <div class="module-header">
-                    <span class="module-title">Risk Index</span>
-                    <i data-lucide="activity" size="14" color="#888"></i>
+                <div class="module-title">Risk Assessment <i data-lucide="activity" size="12"></i></div>
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <span class="stat-value" style="color: var(--color-green); font-size: 32px;">8.4</span>
+                    <span style="font-size: 9px; color: var(--color-text-low);">THREAT LEVEL: CRITICAL</span>
                 </div>
-                <div style="display: flex; align-items: baseline; gap: 12px;">
-                    <span style="font-family: var(--font-mono); font-size: 36px; color: var(--accent-green); font-weight: 600;">8.4</span>
-                    <span style="font-size: 10px; color: var(--text-low); letter-spacing: 1px;">CRITICAL THREAT LEVEL</span>
-                </div>
-                <div style="height: 4px; background: #111; margin-top: 20px; border-radius: 2px;">
-                    <div style="width: 84%; height: 100%; background: var(--accent-green); box-shadow: 0 0 15px var(--accent-green); border-radius: 2px;"></div>
+                <div style="height: 3px; background: #111; margin-top: 15px;">
+                    <div style="width: 84%; height: 100%; background: var(--color-green); box-shadow: 0 0 10px var(--color-green);"></div>
                 </div>
             </div>
 
             <div class="module">
-                <div class="module-header"><span class="module-title">Global Metrics</span></div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="module-title">Threat Metrics</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div>
-                        <span class="stat-val" id="total-events">1,429,081</span>
-                        <div class="stat-label">Total Events</div>
+                        <div class="stat-value" id="count-events">1,429,081</div>
+                        <div class="stat-sub">Total Events</div>
                     </div>
                     <div>
-                        <span class="stat-val" style="color: var(--accent-green);">12.4k</span>
-                        <div class="stat-label">Active Attacks</div>
+                        <div class="stat-value" style="color: var(--color-green);">12.4k</div>
+                        <div class="stat-sub">Active Attacks</div>
                     </div>
                 </div>
-                <div style="height: 140px; margin-top: 24px;">
-                    <canvas id="threatChart"></canvas>
+                <div style="height: 120px; margin-top: 20px;">
+                    <canvas id="chart-trend"></canvas>
                 </div>
             </div>
 
-            <div class="module" style="border-bottom: none;">
-                <div class="module-header"><span class="module-title">Infection Vectors</span></div>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div class="target-row">
-                        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px; font-family: var(--font-mono);">
-                            <span>PHISHING CAMPAIGNS</span><span>42%</span>
-                        </div>
-                        <div style="height: 2px; background: #111;"><div style="width: 42%; height: 100%; background: #fff;"></div></div>
+            <div class="module">
+                <div class="module-title">Vector Analysis</div>
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 10px; font-family: var(--font-mono);">
+                    <div class="row">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>EXPLOIT_KIT</span><span>45%</span></div>
+                        <div style="height:2px; background:#111;"><div style="width:45%; height:100%; background:#fff;"></div></div>
                     </div>
-                    <div class="target-row">
-                        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px; font-family: var(--font-mono);">
-                            <span>ZERO-DAY EXPLOITS</span><span>28%</span>
-                        </div>
-                        <div style="height: 2px; background: #111;"><div style="width: 28%; height: 100%; background: #888;"></div></div>
+                    <div class="row">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>BRUTE_FORCE</span><span>32%</span></div>
+                        <div style="height:2px; background:#111;"><div style="width:32%; height:100%; background:#888;"></div></div>
                     </div>
-                    <div class="target-row">
-                        <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px; font-family: var(--font-mono);">
-                            <span>CREDENTIAL THEFT</span><span>18%</span>
-                        </div>
-                        <div style="height: 2px; background: #111;"><div style="width: 18%; height: 100%; background: #444;"></div></div>
+                    <div class="row">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>PHISHING</span><span>23%</span></div>
+                        <div style="height:2px; background:#111;"><div style="width:23%; height:100%; background:#444;"></div></div>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Viewport -->
+        <!-- Viewport Area -->
         <section id="viewport-area">
-            <div class="hud-top-right">
-                <div class="nav-tabs hud-card">
-                    <button class="nav-btn active" id="view-3d-btn" onclick="switchView('3d')">3D Globe</button>
-                    <button class="nav-btn" id="view-2d-btn" onclick="switchView('2d')">2D Map</button>
+            <div id="hud-controls">
+                <div class="hud-group">
+                    <button class="toggle-btn active" id="btn-3d" onclick="toggleView('3d')">3D GLOBE</button>
+                    <button class="toggle-btn" id="btn-2d" onclick="toggleView('2d')">2D MAP</button>
                 </div>
-                <div class="hud-card" style="font-family: var(--font-mono); font-size: 11px;">
-                    <div style="color: var(--text-low); margin-bottom: 6px; font-size: 9px; letter-spacing: 1px;">GEOSPATIAL COORDINATES</div>
-                    <div id="lat-lng-display" style="color: var(--text-mid);">0.0000, 0.0000</div>
+                <div class="hud-group" style="padding: 10px; font-family: var(--font-mono); font-size: 10px; color: var(--color-text-mid);">
+                    COORD: <span id="ui-coords">0.00, 0.00</span>
                 </div>
             </div>
 
-            <div id="globe-container" class="view-container active"></div>
-            <div id="map-container" class="view-container"></div>
+            <!-- Globe Container -->
+            <div id="globe-container" class="map-wrapper active"></div>
+            
+            <!-- Map 2D Container (Leaflet) -->
+            <div id="map-container" class="map-wrapper"></div>
 
-            <!-- Other Tabs -->
-            <div id="panel-intel" class="content-panel">
-                <h1 style="font-family: var(--font-mono); margin-bottom: 30px; letter-spacing: 2px;">Threat Intelligence Engine</h1>
-                <p style="color: var(--text-mid); margin-bottom: 40px;">Deep analysis of indicators of compromise (IOCs) and threat actor profiling.</p>
-                <!-- Content here -->
-            </div>
-
-            <div id="panel-cve" class="content-panel">
-                <h1 style="font-family: var(--font-mono); margin-bottom: 30px; letter-spacing: 2px;">Vulnerability Database (CVE)</h1>
-                <div id="cve-table-container"></div>
+            <!-- Tab Panels -->
+            <div id="panel-cve" class="tab-panel">
+                <h1 style="font-family: var(--font-mono); margin-bottom: 20px;">CVE Vulnerability Database</h1>
+                <table class="cve-table">
+                    <thead>
+                        <tr><th>ID</th><th>SCORE</th><th>SEVERITY</th><th>SUMMARY</th></tr>
+                    </thead>
+                    <tbody id="cve-body"></tbody>
+                </table>
             </div>
         </section>
 
         <!-- Sidebar Right -->
         <aside class="sidebar sidebar-right">
             <div class="module" style="flex: 1; display: flex; flex-direction: column;">
-                <div class="module-header">
-                    <span class="module-title">Live Attack Stream</span>
-                    <div style="display: flex; align-items: center;">
-                        <span class="pulse-live"></span>
-                        <span style="font-size: 10px; color: var(--accent-green); font-family: var(--font-mono);">REAL-TIME</span>
-                    </div>
-                </div>
+                <div class="module-title">Live Attack Stream <i data-lucide="zap" size="12" color="#00FF78"></i></div>
                 <div id="live-feed"></div>
             </div>
             
-            <div class="module" style="border-bottom: none; height: 220px;">
-                <div class="module-header"><span class="module-title">Source Distribution</span></div>
-                <div style="height: 160px;">
-                    <canvas id="originRadar"></canvas>
+            <div class="module" style="height: 200px; border-bottom: none;">
+                <div class="module-title">Origin Hotspots</div>
+                <div style="height: 140px;">
+                    <canvas id="chart-radar"></canvas>
                 </div>
             </div>
         </aside>
     </div>
 
     <footer id="app-footer">
-        <div style="display: flex; gap: 24px;">
-            <span>STATUS: <span style="color: var(--accent-green);">OPERATIONAL</span></span>
-            <span>SYSTEM_NODE: P-BETA-77</span>
-            <span>LATENCY: 8ms</span>
+        <div style="display: flex; gap: 20px;">
+            <span>NODE: SEC-SOC-01</span>
+            <span>LATENCY: 14ms</span>
+            <span>ENCRYPTION: AES-256</span>
         </div>
-        <div style="display: flex; gap: 24px;">
-            <span>ENCRYPTION: AES-256-GCM</span>
-            <span style="color: var(--text-mid);">© 2024 GLOBAL CYBER DEFENSE NETWORK.</span>
+        <div style="display: flex; gap: 20px;">
+            <span>LICENSE: ENTERPRISE_CORE</span>
+            <span>© 2024 GLOBAL DEFENSE INTEL</span>
         </div>
     </footer>
 
     <script>
-        // --- GLOBAL CONFIG ---
+        // --- DATA & STATE ---
         const state = {
-            currentTab: 'dashboard',
-            currentView: '3d',
+            view: '3d',
             globe: null,
             map: null,
-            markers2d: [],
-            lines2d: []
+            attackData: [],
+            cves: [
+                { id: 'CVE-2024-21626', score: '9.8', sev: 'CRITICAL', desc: 'runc container breakout vulnerability' },
+                { id: 'CVE-2024-23897', score: '8.4', sev: 'HIGH', desc: 'Jenkins arbitrary file read via CLI' },
+                { id: 'CVE-2023-46604', score: '10.0', sev: 'CRITICAL', desc: 'Apache ActiveMQ RCE' },
+                { id: 'CVE-2024-20253', score: '8.8', sev: 'HIGH', desc: 'Cisco Unity Connection RCE' }
+            ]
         };
 
         lucide.createIcons();
 
         // --- CLOCK ---
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('system-clock').innerText = now.toUTCString().split(' ')[4] + ' UTC';
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toUTCString().split(' ')[4] + ' UTC';
+        }, 1000);
 
-        // --- 3D GLOBE (High Contrast & Clear) ---
+        // --- 3D GLOBE ---
         function initGlobe() {
-            const container = document.getElementById('globe-container');
+            const el = document.getElementById('globe-container');
             state.globe = Globe()
-                (container)
-                // Use a high-quality monochromatic texture
-                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                (el)
+                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
                 .backgroundColor('rgba(0,0,0,0)')
                 .showAtmosphere(true)
-                .atmosphereColor('#ffffff')
+                .atmosphereColor('#00FF78')
                 .atmosphereAltitude(0.15)
                 .arcColor(() => '#00FF78')
                 .arcDashLength(0.4)
                 .arcDashGap(4)
                 .arcDashAnimateTime(1500)
-                .arcStroke(0.5)
+                .arcStroke(0.3)
                 .ringColor(() => '#00FF78')
                 .ringMaxRadius(2.5)
                 .ringPropagationSpeed(3)
-                .ringRepeatPeriod(1000);
+                .ringRepeatPeriod(800);
 
-            // Fetch Polygons to draw borders - this makes continents EXTREMELY clear
+            // Fetch and draw polygons (Borders)
             fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson')
                 .then(res => res.json())
                 .then(countries => {
                     state.globe.polygonsData(countries.features)
-                        .polygonCapColor(() => 'rgba(255, 255, 255, 0.05)')
-                        .polygonSideColor(() => 'rgba(0, 0, 0, 0.2)')
-                        .polygonStrokeColor(() => '#444');
+                        .polygonCapColor(() => 'rgba(255, 255, 255, 0.04)')
+                        .polygonSideColor(() => 'rgba(0, 0, 0, 0.5)')
+                        .polygonStrokeColor(() => '#333');
                 });
 
-            // Lighting setup for Globe.gl/Three.js
-            const scene = state.globe.scene();
-            scene.children.forEach(obj => {
-                if (obj.type === 'DirectionalLight' || obj.type === 'AmbientLight') {
-                    if (obj.type === 'AmbientLight') obj.intensity = 1.2;
-                    if (obj.type === 'DirectionalLight') obj.intensity = 2.0;
-                }
-            });
-
             state.globe.controls().autoRotate = true;
-            state.globe.controls().autoRotateSpeed = 0.6;
+            state.globe.controls().autoRotateSpeed = 0.5;
             state.globe.pointOfView({ lat: 20, lng: 0, altitude: 2.2 });
 
             window.addEventListener('resize', () => {
-                state.globe.width(container.offsetWidth);
-                state.globe.height(container.offsetHeight);
+                state.globe.width(el.offsetWidth);
+                state.globe.height(el.offsetHeight);
             });
         }
 
-        // --- 2D MAP (Leaflet + OpenStreetMap tiles) ---
+        // --- 2D MAP (Leaflet + CartoDB Dark - NO API KEY) ---
         function initMap() {
-            // No API Key required for CartoDB Dark Matter tiles via CDN
+            const el = document.getElementById('map-container');
+            // CartoDB Dark Matter tiles are free to use without API key for most use cases
             state.map = L.map('map-container', {
                 center: [20, 0],
                 zoom: 2,
@@ -522,179 +500,115 @@
             }).addTo(state.map);
 
             state.map.on('mousemove', (e) => {
-                document.getElementById('lat-lng-display').innerText = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+                document.getElementById('ui-coords').innerText = `${e.latlng.lat.toFixed(2)}, ${e.latlng.lng.toFixed(2)}`;
             });
+        }
+
+        // --- UI CONTROLS ---
+        function toggleView(view) {
+            state.view = view;
+            const gEl = document.getElementById('globe-container');
+            const mEl = document.getElementById('map-container');
+            const btn3 = document.getElementById('btn-3d');
+            const btn2 = document.getElementById('btn-2d');
+
+            if (view === '3d') {
+                gEl.classList.add('active');
+                mEl.classList.remove('active');
+                btn3.classList.add('active');
+                btn2.classList.remove('active');
+            } else {
+                mEl.classList.add('active');
+                gEl.classList.remove('active');
+                btn2.classList.add('active');
+                btn3.classList.remove('active');
+                setTimeout(() => state.map.invalidateSize(), 200);
+            }
+        }
+
+        function switchNav(tab) {
+            const cvePanel = document.getElementById('panel-cve');
+            if (tab === 'cve') {
+                cvePanel.classList.add('active');
+            } else {
+                cvePanel.classList.remove('active');
+            }
         }
 
         // --- ATTACK SIMULATION ---
-        const locations = [
-            { lat: 40.7, lng: -74, name: "US-NEW YORK" },
-            { lat: 35.6, lng: 139.6, name: "JP-TOKYO" },
-            { lat: 51.5, lng: -0.1, name: "UK-LONDON" },
-            { lat: 39.9, lng: 116.4, name: "CN-BEIJING" },
-            { lat: -23.5, lng: -46.6, name: "BR-SAO PAULO" },
-            { lat: 55.7, lng: 37.6, name: "RU-MOSCOW" },
-            { lat: -33.8, lng: 151.2, name: "AU-SYDNEY" },
-            { lat: 28.6, lng: 77.2, name: "IN-DELHI" }
+        const locs = [
+            { lat: 40.7, lng: -74, n: 'USA' }, { lat: 35.6, lng: 139, n: 'JPN' },
+            { lat: 51.5, lng: -0.1, n: 'GBR' }, { lat: 39.9, lng: 116, n: 'CHN' },
+            { lat: 55.7, lng: 37.6, n: 'RUS' }, { lat: -23.5, lng: -46.6, n: 'BRA' }
         ];
+        const types = ["DDoS_STORM", "SQL_INJECT", "RANSOM_PUSH", "SSH_BRUTE"];
 
-        const attackTypes = ["DDoS ATTACK", "SQL INJECTION", "RANSOMWARE BEACON", "BRUTE FORCE", "C2 CALLBACK", "ZERO-DAY EXPLOIT"];
+        function trigger() {
+            const s = locs[Math.floor(Math.random()*locs.length)];
+            const d = locs[Math.floor(Math.random()*locs.length)];
+            if(s === d) return;
 
-        function triggerAttack() {
-            const src = locations[Math.floor(Math.random() * locations.length)];
-            const dst = locations[Math.floor(Math.random() * locations.length)];
-            if (src === dst) return;
+            const t = types[Math.floor(Math.random()*types.length)];
+            
+            // 3D
+            const arcs = state.globe.arcsData();
+            state.globe.arcsData([...arcs.slice(-30), { startLat: s.lat, startLng: s.lng, endLat: d.lat, endLng: d.lng }]);
+            const rings = state.globe.ringsData();
+            state.globe.ringsData([...rings.slice(-15), { lat: d.lat, lng: d.lng }]);
 
-            const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
-            const id = Math.random().toString(16).slice(2, 8).toUpperCase();
-
-            // 3D Update
-            if (state.globe) {
-                const arcs = state.globe.arcsData();
-                state.globe.arcsData([...arcs.slice(-30), { startLat: src.lat, startLng: src.lng, endLat: dst.lat, endLng: dst.lng }]);
-                
-                const rings = state.globe.ringsData();
-                state.globe.ringsData([...rings.slice(-15), { lat: dst.lat, lng: dst.lng }]);
-            }
-
-            // 2D Update (Lines on Leaflet)
-            if (state.map && state.currentView === '2d') {
-                const line = L.polyline([[src.lat, src.lng], [dst.lat, dst.lng]], {
-                    color: '#00FF78',
-                    weight: 1,
-                    opacity: 0.6
-                }).addTo(state.map);
-                
+            // 2D Line (Ephemeral)
+            if (state.map && state.view === '2d') {
+                const line = L.polyline([[s.lat, s.lng], [d.lat, d.lng]], { color: '#00FF78', weight: 1, opacity: 0.5 }).addTo(state.map);
                 setTimeout(() => state.map.removeLayer(line), 2000);
             }
 
-            // Feed Update
-            const feed = document.getElementById('live-feed');
-            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            // Feed
+            const f = document.getElementById('live-feed');
             const item = document.createElement('div');
             item.className = 'feed-item';
             item.innerHTML = `
-                <div style="display: flex; justify-content: space-between; font-size: 10px;">
-                    <span class="severity-high">${type}</span>
-                    <span style="color: var(--text-low);">${time}</span>
-                </div>
-                <div class="feed-item-details">#${id} FROM: ${src.name} // TARGETING: ${dst.name}</div>
+                <div class="feed-header"><span class="severity-badge">${t}</span><span>${new Date().toLocaleTimeString()}</span></div>
+                <div class="feed-body">#${Math.random().toString(36).substr(2,5).toUpperCase()} SRC: ${s.n} → DST: ${d.n}</div>
             `;
-            feed.prepend(item);
-            if (feed.children.length > 20) feed.removeChild(feed.lastChild);
+            f.prepend(item);
+            if(f.children.length > 15) f.removeChild(f.lastChild);
 
-            // Stats update
-            const totalEl = document.getElementById('total-events');
-            let val = parseInt(totalEl.innerText.replace(/,/g, ''));
-            totalEl.innerText = (val + 1).toLocaleString();
+            // Counter
+            const c = document.getElementById('count-events');
+            c.innerText = (parseInt(c.innerText.replace(/,/g,'')) + 1).toLocaleString();
         }
 
-        // --- NAVIGATION ---
-        function switchMainTab(tab) {
-            state.currentTab = tab;
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
-            if (tab !== 'dashboard') {
-                document.getElementById(`panel-${tab}`).classList.add('active');
-            }
-        }
-
-        function switchView(view) {
-            state.currentView = view;
-            const gCont = document.getElementById('globe-container');
-            const mCont = document.getElementById('map-container');
-            const gBtn = document.getElementById('view-3d-btn');
-            const mBtn = document.getElementById('view-2d-btn');
-
-            if (view === '3d') {
-                gCont.classList.add('active');
-                mCont.classList.remove('active');
-                gBtn.classList.add('active');
-                mBtn.classList.remove('active');
-            } else {
-                mCont.classList.add('active');
-                gCont.classList.remove('active');
-                mBtn.classList.add('active');
-                gBtn.classList.remove('active');
-                setTimeout(() => state.map.invalidateSize(), 100);
-            }
-        }
-
-        // --- CHARTS ---
+        // --- CHARTS & BOOT ---
         function initCharts() {
-            const ctx1 = document.getElementById('threatChart').getContext('2d');
-            new Chart(ctx1, {
+            new Chart(document.getElementById('chart-trend'), {
                 type: 'line',
-                data: {
-                    labels: Array(20).fill(''),
-                    datasets: [{
-                        data: Array(20).fill(0).map(() => 20 + Math.random() * 60),
-                        borderColor: '#00FF78',
-                        borderWidth: 1.5,
-                        pointRadius: 0,
-                        fill: true,
-                        backgroundColor: 'rgba(0, 255, 120, 0.05)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { display: false },
-                        y: { grid: { color: '#111' }, ticks: { display: false } }
-                    }
-                }
+                data: { labels: Array(20).fill(''), datasets: [{ data: Array(20).fill(0).map(()=>Math.random()*100), borderColor: '#00FF78', borderWidth: 1, pointRadius: 0, fill: true, backgroundColor: 'rgba(0, 255, 120, 0.05)', tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
             });
-
-            const ctx2 = document.getElementById('originRadar').getContext('2d');
-            new Chart(ctx2, {
+            new Chart(document.getElementById('chart-radar'), {
                 type: 'radar',
-                data: {
-                    labels: ['NORTH AM.', 'EUROPE', 'EAST ASIA', 'RUSSIA', 'OTHERS'],
-                    datasets: [{
-                        data: [85, 60, 95, 80, 40],
-                        borderColor: '#00FF78',
-                        backgroundColor: 'rgba(0, 255, 120, 0.1)',
-                        borderWidth: 1,
-                        pointRadius: 2,
-                        pointBackgroundColor: '#00FF78'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        r: {
-                            grid: { color: '#222' },
-                            angleLines: { color: '#222' },
-                            pointLabels: { color: '#888', font: { size: 9, family: 'IBM Plex Mono' } },
-                            ticks: { display: false }
-                        }
-                    }
-                }
+                data: { labels: ['NA', 'EU', 'ASIA', 'RU', 'SA'], datasets: [{ data: [80, 60, 90, 70, 40], borderColor: '#00FF78', backgroundColor: 'rgba(0, 255, 120, 0.1)', borderWidth: 1 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { grid: { color: '#222' }, angleLines: { color: '#222' }, pointLabels: { color: '#888', font: { size: 9 } }, ticks: { display: false } } } }
             });
         }
 
-        // --- BOOT ---
-        window.addEventListener('DOMContentLoaded', () => {
+        window.onload = () => {
             initGlobe();
             initMap();
             initCharts();
-            setInterval(triggerAttack, 1200);
             
-            // Adjust globe sizing
-            setTimeout(() => {
-                const container = document.getElementById('globe-container');
-                state.globe.width(container.offsetWidth);
-                state.globe.height(container.offsetHeight);
-            }, 500);
-        });
+            // Populate CVE
+            const cveB = document.getElementById('cve-body');
+            state.cves.forEach(c => {
+                cveB.innerHTML += `<tr><td class="cve-id">${c.id}</td><td>${c.score}</td><td style="color:#f55">${c.sev}</td><td style="color:#999">${c.desc}</td></tr>`;
+            });
 
+            setInterval(trigger, 1200);
+            setTimeout(() => {
+                const el = document.getElementById('globe-container');
+                state.globe.width(el.offsetWidth).height(el.offsetHeight);
+            }, 500);
+        };
     </script>
 </body>
 </html>
